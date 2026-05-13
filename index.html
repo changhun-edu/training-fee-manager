@@ -328,12 +328,29 @@
             }
         }
 
+        // ⭐ 에러가 발생하던 삭제 기능 일괄 패치 (하위 데이터도 모두 Batch 처리로 완벽 삭제)
         async function deleteMember(memberId, role) {
-            if(!confirm(`정말 [${role}] 명단을 삭제하시겠습니까?\n(입력된 지출 내역도 모두 접근할 수 없게 됩니다)`)) return;
+            if(!confirm(`정말 [${role}] 명단을 삭제하시겠습니까?\n(입력된 지출 내역도 모두 함께 삭제되며 복구할 수 없습니다.)`)) return;
+            
             try {
-                await db.collection('groups').doc(currentGroupId).collection('members').doc(memberId).delete();
+                const memberRef = db.collection('groups').doc(currentGroupId).collection('members').doc(memberId);
+                const batch = db.batch();
+                
+                // 1. 하위 데이터(지출 내역 컬렉션) 조회 및 일괄 삭제 예약
+                const expensesSnapshot = await memberRef.collection('expenses').get();
+                expensesSnapshot.forEach(doc => {
+                    batch.delete(doc.ref);
+                });
+                
+                // 2. 명단 본체 문서 삭제 예약
+                batch.delete(memberRef);
+                
+                // 3. 일괄 삭제 실행
+                await batch.commit();
+
             } catch (e) {
-                alert('삭제 실패: ' + e.message);
+                console.error("삭제 중 오류:", e);
+                alert(`삭제를 완료하지 못했습니다.\n\n오류 내용: ${e.message}\n\n💡 팁: Firebase 규칙(Rules) 설정에서 삭제(write) 권한이 제대로 설정되어 있는지 확인해 주세요.`);
             }
         }
 
@@ -392,6 +409,7 @@
                         return;
                     }
 
+                    // 커스텀 정렬 적용 (교장 > 교감 > 기타)
                     const sortedDocs = snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() }));
                     sortedDocs.sort((a, b) => {
                         const pA = getSortPriority(a.data.role);
@@ -465,6 +483,7 @@
             }
         }
 
+        // ⭐ 사용자 대시보드 로드: 다른 사람의 잔액을 숨기고 '내역 입력' 안내로 교체
         function loadMembers() {
             const listDiv = document.getElementById('member-list');
             listDiv.innerHTML = '<div class="col-span-full text-center py-10 text-gray-400">데이터를 불러오는 중...</div>';
@@ -474,6 +493,7 @@
                     listDiv.innerHTML = '';
                     if (snapshot.empty) return listDiv.innerHTML = '<div class="col-span-full text-center py-10 text-gray-400">등록된 명단이 없습니다.</div>';
                     
+                    // 커스텀 정렬 적용 (교장 > 교감 > 기타)
                     const sortedDocs = snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() }));
                     sortedDocs.sort((a, b) => {
                         const pA = getSortPriority(a.data.role);
@@ -496,11 +516,10 @@
                         div.innerHTML = `
                             <div>
                                 <span class="font-bold text-gray-800 text-lg">${data.role}</span>
-                                ${data.pin ? '<span class="ml-1 text-gray-400 text-sm">🔒</span>' : '<span class="ml-1 text-red-400 text-[10px] border border-red-300 px-1 rounded">초기설정필요</span>'}
+                                ${data.pin ? '<span class="ml-2 text-gray-400 text-xs">🔒 보호됨</span>' : '<span class="ml-1 text-red-400 text-[10px] border border-red-300 px-1 rounded">초기설정필요</span>'}
                             </div>
-                            <div class="text-right">
-                                <div class="text-[10px] text-gray-400 uppercase">잔액</div>
-                                <div class="font-bold text-blue-600 text-lg">${balance.toLocaleString()}원</div>
+                            <div class="text-right text-blue-500 font-bold text-sm">
+                                내역 입력 ➔
                             </div>
                         `;
                         listDiv.appendChild(div);
@@ -556,13 +575,7 @@
                 const memberRef = db.collection('groups').doc(currentGroupId).collection('members').doc(currentMemberId);
                 const expenseRef = memberRef.collection('expenses').doc();
 
-                // 증빙제출 여부를 false로 기본 세팅하여 저장합니다.
-                await expenseRef.set({ 
-                    item: item, 
-                    amount: amount, 
-                    date: new Date().toISOString(),
-                    receiptSubmitted: false 
-                });
+                await expenseRef.set({ item: item, amount: amount, date: new Date().toISOString() });
 
                 const doc = await memberRef.get();
                 const currentSpent = doc.data().spentAmount || 0;
@@ -581,18 +594,6 @@
             }
         }
 
-        // 증빙(영수증/이수증) 제출 상태를 변경하는 함수
-        async function toggleReceipt(expenseId, currentStatus) {
-            try {
-                await db.collection('groups').doc(currentGroupId)
-                    .collection('members').doc(currentMemberId)
-                    .collection('expenses').doc(expenseId)
-                    .update({ receiptSubmitted: !currentStatus });
-            } catch (e) {
-                alert('상태 변경 실패: ' + e.message);
-            }
-        }
-
         function loadExpenses() {
             const historyDiv = document.getElementById('expense-history');
             historyDiv.innerHTML = '';
@@ -607,26 +608,14 @@
                         const dateObj = new Date(data.date);
                         const dateStr = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}`;
                         
-                        // 제출 여부 상태 체크
-                        const isSubmitted = data.receiptSubmitted || false;
-                        const btnClass = isSubmitted 
-                            ? 'bg-green-100 text-green-700 border-green-300 hover:bg-green-200' 
-                            : 'bg-white text-gray-500 border-gray-300 hover:bg-gray-100';
-                        const btnText = isSubmitted ? '✅ 증빙제출 완료' : '미제출 (클릭)';
-
                         const itemDiv = document.createElement('div');
                         itemDiv.className = 'flex justify-between items-center text-sm p-3 bg-gray-50 rounded-lg mb-2 border border-gray-200';
                         itemDiv.innerHTML = `
-                            <div class="flex flex-col flex-1 mr-2 overflow-hidden">
-                                <span class="font-bold text-gray-800 truncate">${data.item}</span>
+                            <div class="flex flex-col">
+                                <span class="font-bold text-gray-800">${data.item}</span>
                                 <span class="text-[10px] text-gray-400 mt-1">${dateStr}</span>
                             </div>
-                            <div class="flex flex-col items-end gap-1 shrink-0">
-                                <span class="font-bold text-blue-600">${data.amount.toLocaleString()}원</span>
-                                <button onclick="toggleReceipt('${doc.id}', ${isSubmitted})" class="text-[10px] px-2 py-1 rounded border shadow-sm transition-colors ${btnClass}">
-                                    ${btnText}
-                                </button>
-                            </div>
+                            <span class="font-bold text-blue-600">${data.amount.toLocaleString()}원</span>
                         `;
                         historyDiv.appendChild(itemDiv);
                     });
@@ -641,56 +630,23 @@
             try {
                 const membersSnapshot = await db.collection('groups').doc(currentGroupId).collection('members').get();
                 
-                const sortedMembers = membersSnapshot.docs.map(doc => ({id: doc.id, data: doc.data()}));
+                // 다운로드용 정렬
+                const sortedMembers = membersSnapshot.docs.map(doc => doc.data());
                 sortedMembers.sort((a, b) => {
-                    const pA = getSortPriority(a.data.role);
-                    const pB = getSortPriority(b.data.role);
+                    const pA = getSortPriority(a.role);
+                    const pB = getSortPriority(b.role);
                     if (pA !== pB) return pA - pB;
-                    return a.data.role.localeCompare(b.data.role, 'ko', { numeric: true });
+                    return a.role.localeCompare(b.role, 'ko', { numeric: true });
                 });
 
-                // 엑셀 헤더에 세부 항목 추가
-                let csvContent = "\uFEFF직책/이름,사용금액,남은금액,반납희망여부,지출내역상세,전체증빙제출여부\n";
+                let csvContent = "\uFEFF직책/이름,사용금액,남은금액,반납희망여부,지출내역상세\n";
 
-                // 모든 멤버의 지출 내역을 순회하며 데이터 취합
-                for (const mDoc of sortedMembers) {
-                    const mData = mDoc.data;
+                for (const mData of sortedMembers) {
                     const spent = Math.max(0, mData.spentAmount || 0);
                     const balance = Math.max(0, 250000 - spent);
                     const returnStatus = mData.isReturning ? 'O' : 'X';
 
-                    // 각 교원별 지출 내역을 가져옵니다
-                    const expensesSnap = await db.collection('groups').doc(currentGroupId)
-                                                 .collection('members').doc(mDoc.id)
-                                                 .collection('expenses').orderBy('date', 'asc').get();
-
-                    let expenseDetails = [];
-                    let allSubmitted = true;
-                    let hasExpenses = !expensesSnap.empty;
-
-                    expensesSnap.forEach(expDoc => {
-                        const exp = expDoc.data();
-                        const submitted = exp.receiptSubmitted ? '제출' : '미제출';
-                        // 예: "운남초 직무연수(50,000원/[제출])"
-                        expenseDetails.push(`${exp.item}(${exp.amount.toLocaleString()}원/[${submitted}])`);
-                        
-                        // 하나라도 미제출 상태라면 allSubmitted를 false로 변경
-                        if (!exp.receiptSubmitted) {
-                            allSubmitted = false;
-                        }
-                    });
-
-                    // 여러 개의 지출 항목을 하나로 합침
-                    const expenseStr = expenseDetails.length > 0 ? expenseDetails.join(" / ") : "내역없음";
-                    
-                    // 핵심 수정 부분: 남은 금액이 0이고, 지출 내역이 존재하며, 모든 영수증이 제출되었을 때만 '완료'
-                    let receiptStr = "미완료";
-                    if (balance === 0 && hasExpenses && allSubmitted) {
-                        receiptStr = "완료";
-                    }
-
-                    // 텍스트 내에 쉼표(,)가 포함될 경우 CSV 포맷이 깨지므로 쌍따옴표로 감싸서 추가
-                    csvContent += `${mData.role},${spent},${balance},${returnStatus},"${expenseStr}",${receiptStr}\n`;
+                    csvContent += `${mData.role},${spent},${balance},${returnStatus},-\n`;
                 }
 
                 const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
