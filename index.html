@@ -8,14 +8,97 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700&display=swap');
-        body { font-family: 'Pretendard', sans-serif; background-color: #f8fafc; }
+        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700;800&display=swap');
+        body { font-family: 'Pretendard', sans-serif; background-color: #f0f4f8; }
         .card { background: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
-        .btn-primary { background-color: #3b82f6; color: white; padding: 10px 20px; border-radius: 8px; font-weight: 600; transition: all 0.2s; }
-        .btn-primary:hover { background-color: #2563eb; }
+        .btn-primary { background-color: #1e40af; color: white; padding: 10px 20px; border-radius: 8px; font-weight: 600; transition: all 0.2s; }
+        .btn-primary:hover { background-color: #1e3a8a; }
         .hidden { display: none !important; }
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+        /* ── 메인 홈 전용 스타일 ── */
+        .home-hero {
+            background: linear-gradient(145deg, #1e3a8a 0%, #1d4ed8 60%, #0369a1 100%);
+            border-radius: 20px;
+            padding: 36px 28px 32px;
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+        .home-hero::before {
+            content: '';
+            position: absolute; inset: 0;
+            background-image: radial-gradient(circle at 15% 50%, rgba(255,255,255,.06) 0%, transparent 50%),
+                              radial-gradient(circle at 85% 20%, rgba(255,255,255,.05) 0%, transparent 40%);
+            pointer-events: none;
+        }
+        .home-hero .hero-icon {
+            font-size: 52px;
+            display: block;
+            margin-bottom: 14px;
+            filter: drop-shadow(0 4px 12px rgba(0,0,0,.2));
+        }
+        .home-hero h1 {
+            font-size: 26px; font-weight: 800;
+            color: #fff; line-height: 1.35;
+            margin-bottom: 8px;
+        }
+        .home-hero p {
+            font-size: 15px; color: rgba(255,255,255,.78);
+            line-height: 1.6;
+        }
+        /* 핵심 기능 3칸 */
+        .feature-strip {
+            display: flex; gap: 8px;
+            margin-top: 22px;
+            justify-content: center;
+        }
+        .feature-chip {
+            background: rgba(255,255,255,.15);
+            border: 1px solid rgba(255,255,255,.25);
+            border-radius: 10px;
+            padding: 8px 12px;
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            flex: 1;
+        }
+        .feature-chip .chip-icon { font-size: 20px; }
+        .feature-chip .chip-text { font-size: 11px; font-weight: 700; color: rgba(255,255,255,.90); text-align: center; line-height: 1.3; }
+
+        /* 역할 카드 */
+        .role-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 22px 20px;
+            border: 2px solid #e2e8f0;
+            cursor: pointer;
+            transition: all .18s;
+            text-align: left;
+            width: 100%;
+            display: flex; align-items: center; gap: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,.06);
+        }
+        .role-card:hover { border-color: #1d4ed8; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(29,78,216,.15); }
+        .role-card:active { transform: translateY(0); }
+        .role-card .rc-icon { font-size: 38px; flex-shrink: 0; }
+        .role-card .rc-body h3 { font-size: 18px; font-weight: 800; color: #1e293b; margin-bottom: 4px; }
+        .role-card .rc-body p  { font-size: 14px; color: #64748b; line-height: 1.5; }
+        .role-card .rc-arrow { margin-left: auto; font-size: 22px; color: #94a3b8; flex-shrink: 0; }
+        .role-card.admin { border-left: 5px solid #1d4ed8; }
+        .role-card.user  { border-left: 5px solid #0ea5e9; }
+
+        /* 사용 순서 */
+        .steps-section { background: #fff; border-radius: 16px; padding: 20px; border: 2px solid #e2e8f0; }
+        .steps-section h4 { font-size: 13px; font-weight: 800; color: #94a3b8; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 14px; }
+        .step-row { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
+        .step-row:last-child { margin-bottom: 0; }
+        .step-num { width: 26px; height: 26px; border-radius: 50%; background: #1d4ed8; color: #fff; font-size: 13px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+        .step-text { font-size: 14px; color: #334155; line-height: 1.55; }
+        .step-text strong { color: #1e293b; }
+
+        /* 신뢰 뱃지 */
+        .trust-row { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+        .trust-chip { display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700; color: #475569; background: #fff; border: 1.5px solid #e2e8f0; padding: 6px 12px; border-radius: 99px; }
     </style>
 </head>
 <body class="relative">
@@ -23,15 +106,77 @@
 
     <div id="app" class="max-w-5xl mx-auto min-h-screen p-4 flex flex-col justify-center w-full">
         
-        <div id="screen-home" class="max-w-md w-full mx-auto space-y-6 text-center">
-            <div class="py-8">
-                <h1 class="text-3xl font-bold text-gray-800">교원 자율연수비 정산</h1>
-                <p class="text-gray-500 mt-2">간편하고 안전한 연수비 관리 서비스</p>
+        <div id="screen-home" class="max-w-md w-full mx-auto space-y-4">
+
+            <!-- 히어로 -->
+            <div class="home-hero">
+                <span class="hero-icon">📋</span>
+                <h1>교원 자율연수비<br>정산 시스템</h1>
+                <p>복잡한 정산, 이제 클릭 몇 번으로<br>간편하고 안전하게 처리하세요</p>
+                <div class="feature-strip">
+                    <div class="feature-chip">
+                        <span class="chip-icon">💰</span>
+                        <span class="chip-text">자동 잔액<br>계산</span>
+                    </div>
+                    <div class="feature-chip">
+                        <span class="chip-icon">🔒</span>
+                        <span class="chip-text">개인 비밀번호<br>보호</span>
+                    </div>
+                    <div class="feature-chip">
+                        <span class="chip-icon">📥</span>
+                        <span class="chip-text">엑셀<br>다운로드</span>
+                    </div>
+                </div>
             </div>
-            <div class="flex flex-col gap-3">
-                <button onclick="showScreen('screen-admin-menu')" class="btn-primary w-full py-4 text-lg">관리자로 시작하기</button>
-                <button onclick="showScreen('screen-user-start')" class="bg-white border-2 border-blue-500 text-blue-600 w-full py-4 rounded-lg font-bold hover:bg-blue-50">사용자로 시작하기</button>
+
+            <!-- 역할 선택 -->
+            <div class="space-y-3">
+                <button onclick="showScreen('screen-admin-menu')" class="role-card admin">
+                    <div class="rc-icon">👑</div>
+                    <div class="rc-body">
+                        <h3>관리자로 시작</h3>
+                        <p>그룹 생성·명단 관리·전체 현황 확인</p>
+                    </div>
+                    <div class="rc-arrow">›</div>
+                </button>
+                <button onclick="showScreen('screen-user-start')" class="role-card user">
+                    <div class="rc-icon">👤</div>
+                    <div class="rc-body">
+                        <h3>교원으로 참여</h3>
+                        <p>그룹 접속·지출 내역 입력·잔액 확인</p>
+                    </div>
+                    <div class="rc-arrow">›</div>
+                </button>
             </div>
+
+            <!-- 사용 순서 -->
+            <div class="steps-section">
+                <h4>사용 순서</h4>
+                <div class="step-row">
+                    <div class="step-num">1</div>
+                    <div class="step-text"><strong>관리자</strong>가 그룹을 생성하고 비밀번호를 설정합니다</div>
+                </div>
+                <div class="step-row">
+                    <div class="step-num">2</div>
+                    <div class="step-text">교원 명단을 추가하고 <strong>그룹명을 교원에게 공유</strong>합니다</div>
+                </div>
+                <div class="step-row">
+                    <div class="step-num">3</div>
+                    <div class="step-text">각 교원이 접속 후 <strong>지출 내역을 직접 입력</strong>합니다</div>
+                </div>
+                <div class="step-row">
+                    <div class="step-num">4</div>
+                    <div class="step-text">관리자가 전체 현황을 확인하고 <strong>엑셀로 다운로드</strong>합니다</div>
+                </div>
+            </div>
+
+            <!-- 신뢰 뱃지 -->
+            <div class="trust-row pb-4">
+                <div class="trust-chip">🔒 데이터 실시간 저장</div>
+                <div class="trust-chip">💻 설치 없이 사용</div>
+                <div class="trust-chip">✅ 무료 서비스</div>
+            </div>
+
         </div>
 
         <div id="screen-admin-menu" class="hidden max-w-md w-full mx-auto space-y-4 text-center">
