@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700;800&display=swap');
         body { font-family: 'Pretendard', sans-serif; background-color: #f0f4f8; }
@@ -436,9 +436,9 @@
         const ROLE_TAIL_ORDER = ["교담", "특수", "보건", "영양", "상담"];
 
         function getSortPriority(role) {
-            if (role === '교장') return 0;
-            if (role === '교감') return 1;
-            const gradeMatch = role.match(/^(\d+)학년\s*(\d+)반$/);
+            if (/^교장(\s|$)/.test(role)) return 0;
+            if (/^교감(\s|$)/.test(role)) return 1;
+            const gradeMatch = role.match(/^(\d+)학년\s*(\d+)반/);
             if (gradeMatch) return 10 + parseInt(gradeMatch[1]) * 100 + parseInt(gradeMatch[2]);
             const tailIdx = ROLE_TAIL_ORDER.findIndex(t => role.startsWith(t));
             if (tailIdx !== -1) return 2000 + tailIdx * 100;
@@ -460,9 +460,9 @@
 
         // 엑셀 "구분" 열 표시용 (교장→학교장, N학년 M반→N-M, 그 외는 그대로)
         function getGubun(role) {
-            if (role === '교장') return '학교장';
-            if (role === '교감') return '교감';
-            const m = role.match(/^(\d+)학년\s*(\d+)반$/);
+            if (/^교장(\s|$)/.test(role)) return '학교장';
+            if (/^교감(\s|$)/.test(role)) return '교감';
+            const m = role.match(/^(\d+)학년\s*(\d+)반/);
             if (m) return `${m[1]}-${m[2]}`;
             const tail = ROLE_TAIL_ORDER.find(t => role.startsWith(t));
             return tail || role;
@@ -759,62 +759,129 @@
                 const members = membersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 members.sort((a, b) => compareRoles(a.role, b.role));
 
-                // 각 인원의 지출 내역(연수/도서 구분 포함) 조회
                 for (const m of members) {
                     const expSnap = await db.collection('groups').doc(currentGroupId).collection('members').doc(m.id).collection('expenses').orderBy('date', 'asc').get();
                     m.expenses = expSnap.docs.map(d => d.data());
                 }
 
-                // ── 시트1: 지출 상세 내역 (구분·이름·개인별합계 병합) ──
-                const sheet1Rows = [['구분', '이름', '과정명(구분)', '금액', '개인별 합계', '반납희망여부']];
-                const merges1 = [];
-                members.forEach(m => {
+                const NAVY = 'FF1E3A8A', ORANGE = 'FFFCE4D6', ORANGE_DEEP = 'FFF5B041', BAND = 'FFF8FAFC', WHITE = 'FFFFFFFF';
+                const GREEN = 'FFDCFCE7', GREEN_TXT = 'FF16A34A', RED = 'FFFEE2E2', RED_TXT = 'FFDC2626', GRAY_TXT = 'FF94A3B8';
+                const thin = { style: 'thin', color: { argb: 'FFCBD5E1' } };
+                const allBorders = { top: thin, left: thin, bottom: thin, right: thin };
+                const todayStr = new Date().toLocaleDateString('ko-KR');
+
+                function styleTitle(sheet, text, numCols) {
+                    sheet.mergeCells(1, 1, 1, numCols);
+                    const cell = sheet.getCell(1, 1);
+                    cell.value = text;
+                    cell.font = { bold: true, size: 14, color: { argb: NAVY } };
+                    cell.alignment = { vertical: 'middle', horizontal: 'left' };
+                    sheet.getRow(1).height = 26;
+                }
+
+                function styleHeaderRow(row) {
+                    row.eachCell(cell => {
+                        cell.font = { bold: true, color: { argb: WHITE } };
+                        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: NAVY } };
+                        cell.alignment = { vertical: 'middle', horizontal: 'center' };
+                        cell.border = allBorders;
+                    });
+                    row.height = 22;
+                }
+
+                const workbook = new ExcelJS.Workbook();
+                workbook.creator = '교원 자율연수비 정산 시스템';
+                workbook.created = new Date();
+
+                // ── 시트1: 지출 상세 내역 ──
+                const ws1 = workbook.addWorksheet('지출상세내역', { views: [{ state: 'frozen', ySplit: 2 }] });
+                ws1.columns = [
+                    { width: 11 }, { width: 14 }, { width: 34 }, { width: 12 }, { width: 13 }, { width: 13 }
+                ];
+                styleTitle(ws1, `📋 자율연수비 지출 상세내역  —  ${currentGroupId}  (${todayStr} 출력)`, 6);
+                const header1 = ws1.addRow(['구분', '이름', '과정명 (구분)', '금액', '개인별 합계', '반납희망여부']);
+                styleHeaderRow(header1);
+
+                members.forEach((m, mi) => {
                     const gubun = getGubun(m.role);
                     const displayName = m.name || m.role;
                     const rows = m.expenses.length > 0 ? m.expenses : [null];
-                    const startRow = sheet1Rows.length;
+                    const startRow = ws1.rowCount + 1;
+                    const band = mi % 2 === 0 ? WHITE : BAND;
+
                     rows.forEach((exp, idx) => {
-                        sheet1Rows.push([
+                        const row = ws1.addRow([
                             idx === 0 ? gubun : '',
                             idx === 0 ? displayName : '',
-                            exp ? `[${exp.category || '-'}] ${exp.item}` : '',
-                            exp ? exp.amount : '',
-                            idx === 0 ? (m.spentAmount || 0) : '',
+                            exp ? `[${exp.category || '-'}] ${exp.item}` : '(지출 내역 없음)',
+                            exp ? exp.amount : null,
+                            idx === 0 ? (m.spentAmount || 0) : null,
                             idx === 0 ? (m.isReturning ? 'O' : 'X') : ''
                         ]);
+                        row.eachCell({ includeEmpty: true }, (cell, colNum) => {
+                            cell.border = allBorders;
+                            if (colNum === 4 || colNum === 5) { cell.numFmt = '#,##0"원"'; cell.alignment = { horizontal: 'right', vertical: 'middle' }; }
+                            else cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: colNum === 3 };
+                            if (colNum === 1) cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: ORANGE } };
+                            else if (colNum !== 6) cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: band } };
+                        });
+                        if (idx === 0) {
+                            const flagCell = row.getCell(6);
+                            flagCell.font = { bold: true, color: { argb: m.isReturning ? RED_TXT : GRAY_TXT } };
+                            flagCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: m.isReturning ? RED : band } };
+                        }
+                        if (idx === 0) { row.getCell(1).font = { bold: true }; row.getCell(2).font = { bold: true }; row.getCell(5).font = { bold: true }; }
                     });
-                    const endRow = sheet1Rows.length - 1;
+
+                    const endRow = ws1.rowCount;
                     if (endRow > startRow) {
-                        [0, 1, 4, 5].forEach(c => merges1.push({ s: { r: startRow, c }, e: { r: endRow, c } }));
+                        [1, 2, 5, 6].forEach(c => ws1.mergeCells(startRow, c, endRow, c));
                     }
                 });
 
-                // ── 시트2: 회차별 정산 (7월/12월/2월) ──
-                const sheet2Rows = [['구분', '이름', '7월 사용액', '12월 사용액', '2월 사용액', '개인별 합계', '7월 지급 후 잔액', '2월 가용금액', '예산 반환액']];
-                members.forEach(m => {
+                // ── 시트2: 회차별 정산 ──
+                const ws2 = workbook.addWorksheet('회차별정산', { views: [{ state: 'frozen', ySplit: 2 }] });
+                ws2.columns = [
+                    { width: 11 }, { width: 14 }, { width: 12 }, { width: 12 }, { width: 12 },
+                    { width: 13 }, { width: 15 }, { width: 14 }, { width: 14 }
+                ];
+                styleTitle(ws2, `📅 회차별 정산 (7월 · 12월 · 2월)  —  ${currentGroupId}  (${todayStr} 출력)`, 9);
+                const header2 = ws2.addRow(['구분', '이름', '7월 사용액', '12월 사용액', '2월 사용액', '개인별 합계', '7월 지급 후 잔액', '2월 가용금액', '예산 반환액']);
+                styleHeaderRow(header2);
+
+                members.forEach((m, mi) => {
                     const totals = { '7월': 0, '12월': 0, '2월': 0 };
                     m.expenses.forEach(exp => { totals[getSettlementPeriod(exp.date)] += exp.amount; });
                     const total = totals['7월'] + totals['12월'] + totals['2월'];
-                    sheet2Rows.push([
+                    const finalReturn = Math.max(0, 250000 - total);
+                    const band = mi % 2 === 0 ? WHITE : BAND;
+
+                    const row = ws2.addRow([
                         getGubun(m.role), m.name || m.role,
                         totals['7월'], totals['12월'], totals['2월'], total,
-                        250000 - totals['7월'],
-                        250000 - totals['7월'] - totals['12월'],
-                        Math.max(0, 250000 - total)
+                        250000 - totals['7월'], 250000 - totals['7월'] - totals['12월'], finalReturn
                     ]);
+                    row.eachCell((cell, colNum) => {
+                        cell.border = allBorders;
+                        if (colNum >= 3) { cell.numFmt = '#,##0"원"'; cell.alignment = { horizontal: 'right', vertical: 'middle' }; }
+                        else cell.alignment = { horizontal: 'center', vertical: 'middle' };
+                        if (colNum === 1) cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: ORANGE } };
+                        else if (colNum !== 9) cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: band } };
+                    });
+                    row.getCell(1).font = { bold: true };
+                    row.getCell(2).font = { bold: true };
+                    row.getCell(6).font = { bold: true };
+                    const returnCell = row.getCell(9);
+                    returnCell.font = { bold: true, color: { argb: finalReturn > 0 ? RED_TXT : GRAY_TXT } };
+                    returnCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: finalReturn > 0 ? RED : band } };
                 });
 
-                const wb = XLSX.utils.book_new();
-                const ws1 = XLSX.utils.aoa_to_sheet(sheet1Rows);
-                ws1['!merges'] = merges1;
-                ws1['!cols'] = [{ wch: 10 }, { wch: 14 }, { wch: 32 }, { wch: 12 }, { wch: 12 }, { wch: 12 }];
-                XLSX.utils.book_append_sheet(wb, ws1, '지출상세내역');
-
-                const ws2 = XLSX.utils.aoa_to_sheet(sheet2Rows);
-                ws2['!cols'] = [{ wch: 10 }, { wch: 14 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 14 }, { wch: 14 }, { wch: 14 }];
-                XLSX.utils.book_append_sheet(wb, ws2, '회차별정산');
-
-                XLSX.writeFile(wb, `자율연수비_${currentGroupId}.xlsx`);
+                const buffer = await workbook.xlsx.writeBuffer();
+                const blob = new Blob([buffer], { type: 'application/octet-stream' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `자율연수비_${currentGroupId}.xlsx`;
+                link.click();
             } catch (e) { alert('엑셀 생성 중 오류: ' + e.message); }
         }
 
