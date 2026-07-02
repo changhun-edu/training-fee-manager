@@ -763,9 +763,10 @@
                     const expSnap = await db.collection('groups').doc(currentGroupId).collection('members').doc(m.id).collection('expenses').orderBy('date', 'asc').get();
                     m.expenses = expSnap.docs.map(d => d.data());
                 }
+                const isBook = exp => exp.category === '도서구입';
 
-                const NAVY = 'FF1E3A8A', ORANGE = 'FFFCE4D6', ORANGE_DEEP = 'FFF5B041', BAND = 'FFF8FAFC', WHITE = 'FFFFFFFF';
-                const GREEN = 'FFDCFCE7', GREEN_TXT = 'FF16A34A', RED = 'FFFEE2E2', RED_TXT = 'FFDC2626', GRAY_TXT = 'FF94A3B8';
+                const NAVY = 'FF1E3A8A', ORANGE = 'FFFCE4D6', BAND = 'FFF8FAFC', WHITE = 'FFFFFFFF';
+                const RED = 'FFFEE2E2', RED_TXT = 'FFDC2626', GRAY_TXT = 'FF94A3B8', TOTAL_FILL = 'FFDCE6F5';
                 const thin = { style: 'thin', color: { argb: 'FFCBD5E1' } };
                 const allBorders = { top: thin, left: thin, bottom: thin, right: thin };
                 const todayStr = new Date().toLocaleDateString('ko-KR');
@@ -789,6 +790,18 @@
                     row.height = 22;
                 }
 
+                function styleTotalRow(sheet, values, numCols) {
+                    const row = sheet.addRow(values);
+                    row.eachCell({ includeEmpty: true }, (cell, colNum) => {
+                        cell.border = allBorders;
+                        cell.font = { bold: true, color: { argb: NAVY } };
+                        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: TOTAL_FILL } };
+                        cell.alignment = { horizontal: colNum <= 2 ? 'center' : 'right', vertical: 'middle' };
+                        if (colNum > 2) cell.numFmt = '#,##0"원"';
+                    });
+                    return row;
+                }
+
                 const workbook = new ExcelJS.Workbook();
                 workbook.creator = '교원 자율연수비 정산 시스템';
                 workbook.created = new Date();
@@ -796,11 +809,13 @@
                 // ── 시트1: 지출 상세 내역 ──
                 const ws1 = workbook.addWorksheet('지출상세내역', { views: [{ state: 'frozen', ySplit: 2 }] });
                 ws1.columns = [
-                    { width: 11 }, { width: 14 }, { width: 34 }, { width: 12 }, { width: 13 }, { width: 13 }
+                    { width: 11 }, { width: 14 }, { width: 32 }, { width: 12 }, { width: 12 }, { width: 12 }, { width: 13 }, { width: 13 }
                 ];
-                styleTitle(ws1, `📋 자율연수비 지출 상세내역  —  ${currentGroupId}  (${todayStr} 출력)`, 6);
-                const header1 = ws1.addRow(['구분', '이름', '과정명 (구분)', '금액', '개인별 합계', '반납희망여부']);
+                styleTitle(ws1, `📋 자율연수비 지출 상세내역  —  ${currentGroupId}  (${todayStr} 출력)`, 8);
+                const header1 = ws1.addRow(['구분', '이름', '과정명 (구분)', '금액', '연수 합계', '도서 합계', '개인별 합계', '반납희망여부']);
                 styleHeaderRow(header1);
+
+                let grandAmount = 0, grandTraining = 0, grandBook = 0;
 
                 members.forEach((m, mi) => {
                     const gubun = getGubun(m.role);
@@ -809,72 +824,99 @@
                     const startRow = ws1.rowCount + 1;
                     const band = mi % 2 === 0 ? WHITE : BAND;
 
+                    const trainingSum = m.expenses.filter(e => !isBook(e)).reduce((s, e) => s + e.amount, 0);
+                    const bookSum = m.expenses.filter(isBook).reduce((s, e) => s + e.amount, 0);
+                    grandTraining += trainingSum; grandBook += bookSum; grandAmount += (m.spentAmount || 0);
+
                     rows.forEach((exp, idx) => {
                         const row = ws1.addRow([
                             idx === 0 ? gubun : '',
                             idx === 0 ? displayName : '',
                             exp ? `[${exp.category || '-'}] ${exp.item}` : '(지출 내역 없음)',
                             exp ? exp.amount : null,
+                            idx === 0 ? trainingSum : null,
+                            idx === 0 ? bookSum : null,
                             idx === 0 ? (m.spentAmount || 0) : null,
                             idx === 0 ? (m.isReturning ? 'O' : 'X') : ''
                         ]);
                         row.eachCell({ includeEmpty: true }, (cell, colNum) => {
                             cell.border = allBorders;
-                            if (colNum === 4 || colNum === 5) { cell.numFmt = '#,##0"원"'; cell.alignment = { horizontal: 'right', vertical: 'middle' }; }
+                            if (colNum >= 4 && colNum <= 7) { cell.numFmt = '#,##0"원"'; cell.alignment = { horizontal: 'right', vertical: 'middle' }; }
                             else cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: colNum === 3 };
                             if (colNum === 1) cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: ORANGE } };
-                            else if (colNum !== 6) cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: band } };
+                            else if (colNum !== 8) cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: band } };
                         });
                         if (idx === 0) {
-                            const flagCell = row.getCell(6);
+                            const flagCell = row.getCell(8);
                             flagCell.font = { bold: true, color: { argb: m.isReturning ? RED_TXT : GRAY_TXT } };
                             flagCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: m.isReturning ? RED : band } };
+                            [1, 2, 5, 6, 7].forEach(c => row.getCell(c).font = { bold: true });
                         }
-                        if (idx === 0) { row.getCell(1).font = { bold: true }; row.getCell(2).font = { bold: true }; row.getCell(5).font = { bold: true }; }
                     });
 
                     const endRow = ws1.rowCount;
                     if (endRow > startRow) {
-                        [1, 2, 5, 6].forEach(c => ws1.mergeCells(startRow, c, endRow, c));
+                        [1, 2, 5, 6, 7, 8].forEach(c => ws1.mergeCells(startRow, c, endRow, c));
                     }
                 });
 
-                // ── 시트2: 회차별 정산 ──
+                styleTotalRow(ws1, ['전체 합계', `${members.length}명`, '', grandAmount, grandTraining, grandBook, grandAmount, ''], 8);
+
+                // ── 시트2: 회차별 정산 (연수/도서 분리) ──
                 const ws2 = workbook.addWorksheet('회차별정산', { views: [{ state: 'frozen', ySplit: 2 }] });
                 ws2.columns = [
-                    { width: 11 }, { width: 14 }, { width: 12 }, { width: 12 }, { width: 12 },
-                    { width: 13 }, { width: 15 }, { width: 14 }, { width: 14 }
+                    { width: 11 }, { width: 14 }, { width: 11 }, { width: 11 }, { width: 11 }, { width: 11 },
+                    { width: 11 }, { width: 11 }, { width: 13 }, { width: 15 }, { width: 14 }, { width: 14 }
                 ];
-                styleTitle(ws2, `📅 회차별 정산 (7월 · 12월 · 2월)  —  ${currentGroupId}  (${todayStr} 출력)`, 9);
-                const header2 = ws2.addRow(['구분', '이름', '7월 사용액', '12월 사용액', '2월 사용액', '개인별 합계', '7월 지급 후 잔액', '2월 가용금액', '예산 반환액']);
+                styleTitle(ws2, `📅 회차별 정산 — 연수/도서 구분 (7월 · 12월 · 2월)  —  ${currentGroupId}  (${todayStr} 출력)`, 12);
+                const header2 = ws2.addRow(['구분', '이름', '7월 연수', '7월 도서', '12월 연수', '12월 도서', '2월 연수', '2월 도서', '개인별 합계', '7월 지급 후 잔액', '2월 가용금액', '예산 반환액']);
                 styleHeaderRow(header2);
 
+                const grandTotals2 = { j_train: 0, j_book: 0, d_train: 0, d_book: 0, f_train: 0, f_book: 0, total: 0 };
+
                 members.forEach((m, mi) => {
-                    const totals = { '7월': 0, '12월': 0, '2월': 0 };
-                    m.expenses.forEach(exp => { totals[getSettlementPeriod(exp.date)] += exp.amount; });
-                    const total = totals['7월'] + totals['12월'] + totals['2월'];
+                    const t = { '7월': { 연수: 0, 도서: 0 }, '12월': { 연수: 0, 도서: 0 }, '2월': { 연수: 0, 도서: 0 } };
+                    m.expenses.forEach(exp => {
+                        const p = getSettlementPeriod(exp.date);
+                        t[p][isBook(exp) ? '도서' : '연수'] += exp.amount;
+                    });
+                    const julyTotal = t['7월'].연수 + t['7월'].도서;
+                    const decTotal = t['12월'].연수 + t['12월'].도서;
+                    const febTotal = t['2월'].연수 + t['2월'].도서;
+                    const total = julyTotal + decTotal + febTotal;
                     const finalReturn = Math.max(0, 250000 - total);
                     const band = mi % 2 === 0 ? WHITE : BAND;
 
+                    grandTotals2.j_train += t['7월'].연수; grandTotals2.j_book += t['7월'].도서;
+                    grandTotals2.d_train += t['12월'].연수; grandTotals2.d_book += t['12월'].도서;
+                    grandTotals2.f_train += t['2월'].연수; grandTotals2.f_book += t['2월'].도서;
+                    grandTotals2.total += total;
+
                     const row = ws2.addRow([
                         getGubun(m.role), m.name || m.role,
-                        totals['7월'], totals['12월'], totals['2월'], total,
-                        250000 - totals['7월'], 250000 - totals['7월'] - totals['12월'], finalReturn
+                        t['7월'].연수, t['7월'].도서, t['12월'].연수, t['12월'].도서, t['2월'].연수, t['2월'].도서,
+                        total, 250000 - julyTotal, 250000 - julyTotal - decTotal, finalReturn
                     ]);
                     row.eachCell((cell, colNum) => {
                         cell.border = allBorders;
                         if (colNum >= 3) { cell.numFmt = '#,##0"원"'; cell.alignment = { horizontal: 'right', vertical: 'middle' }; }
                         else cell.alignment = { horizontal: 'center', vertical: 'middle' };
                         if (colNum === 1) cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: ORANGE } };
-                        else if (colNum !== 9) cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: band } };
+                        else if (colNum !== 12) cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: band } };
                     });
                     row.getCell(1).font = { bold: true };
                     row.getCell(2).font = { bold: true };
-                    row.getCell(6).font = { bold: true };
-                    const returnCell = row.getCell(9);
+                    row.getCell(9).font = { bold: true };
+                    const returnCell = row.getCell(12);
                     returnCell.font = { bold: true, color: { argb: finalReturn > 0 ? RED_TXT : GRAY_TXT } };
                     returnCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: finalReturn > 0 ? RED : band } };
                 });
+
+                styleTotalRow(ws2, [
+                    '전체 합계', `${members.length}명`,
+                    grandTotals2.j_train, grandTotals2.j_book, grandTotals2.d_train, grandTotals2.d_book,
+                    grandTotals2.f_train, grandTotals2.f_book, grandTotals2.total, '', '', ''
+                ], 12);
 
                 const buffer = await workbook.xlsx.writeBuffer();
                 const blob = new Blob([buffer], { type: 'application/octet-stream' });
