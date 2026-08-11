@@ -19,6 +19,35 @@
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
+        /* ── 비밀번호 표시 버튼 (누르고 있는 동안만 보임) ── */
+        .pw-wrap { position: relative; }
+        .pw-eye {
+            position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+            background: transparent; border: 0; padding: 8px 10px;
+            font-size: 18px; line-height: 1; opacity: .4; cursor: pointer;
+            user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent;
+        }
+        .pw-eye:hover { opacity: .7; }
+        .pw-eye.on { opacity: 1; }
+
+        /* ── 그룹 생성 완료 안내 카드 ── */
+        .modal-backdrop {
+            position: fixed; inset: 0; z-index: 100;
+            background: rgba(15, 23, 42, .55);
+            display: flex; align-items: center; justify-content: center;
+            padding: 16px;
+        }
+        .modal-box {
+            background: #fff; border-radius: 16px; width: 100%; max-width: 420px;
+            padding: 24px 20px; max-height: 90vh; overflow-y: auto;
+        }
+        .guide-box {
+            background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px;
+            padding: 14px; font-size: 14px; line-height: 1.8; word-break: break-all;
+        }
+        .guide-box .g-label { color: #64748b; font-size: 12px; }
+        .guide-box .g-value { font-weight: 700; color: #0f172a; }
+
         /* ── 메인 홈 전용 스타일 ── */
         .home-hero {
             background: linear-gradient(145deg, #1e3a8a 0%, #1d4ed8 60%, #0369a1 100%);
@@ -348,6 +377,18 @@
 
     </div>
 
+    <!-- 그룹 생성 완료 안내 카드 -->
+    <div id="created-modal" class="modal-backdrop hidden">
+        <div class="modal-box">
+            <h3 class="text-xl font-bold text-gray-800 mb-1">✅ 그룹이 생성되었습니다</h3>
+            <p class="text-sm text-gray-500 mb-4">아래 내용을 선생님들께 안내해 주세요.</p>
+            <div id="created-guide" class="guide-box"></div>
+            <button onclick="copyGuide()" id="copy-guide-btn" class="btn-primary w-full py-3 mt-3">📋 안내 문구 복사하기</button>
+            <p class="text-xs text-red-500 mt-3 font-semibold">※ 관리자 비밀번호는 이 안내에 포함되지 않습니다. 본인만 보관하세요.</p>
+            <button onclick="closeCreatedModal()" class="w-full text-gray-500 py-3 mt-1 hover:underline">닫고 관리 화면으로</button>
+        </div>
+    </div>
+
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyCLUAPBLsIkqefkeNdWjY7QgSYioqfeziQ",
@@ -622,15 +663,101 @@
                 });
                 await batch.commit();
 
-                alert('그룹이 생성되었습니다!');
                 currentGroupId = groupId;
                 saveSession('admin', groupId);
                 dashboardScreen = 'screen-admin-dashboard';
                 document.getElementById('admin-display-group-name').innerText = name + ' (관리자)';
                 loadAdminDashboard();
                 showScreen('screen-admin-dashboard');
+                openCreatedModal(name, teacherPw);
             } catch (e) { alert(authErrorMessage(e)); }
         }
+
+        // ── 그룹 생성 완료 안내 카드 ──
+        let guideText = '';
+
+        function openCreatedModal(name, teacherPw) {
+            const url = location.origin + location.pathname + '?group=' + encodeURIComponent(name);
+            guideText =
+                '[교원 자율연수비 정산 안내]\n' +
+                '\u25b7 접속 주소: ' + url + '\n' +
+                '\u25b7 그룹명: ' + name + '\n' +
+                '\u25b7 비밀번호: ' + teacherPw + '\n\n' +
+                '\u203b 접속 후 본인 구분을 선택하고 개인 비밀번호를 설정한 뒤 지출 내역을 입력해 주세요.';
+
+            document.getElementById('created-guide').innerHTML =
+                '<div class="g-label">접속 주소</div>' +
+                '<div class="g-value text-blue-700 text-xs mb-2">' + url + '</div>' +
+                '<div class="g-label">그룹명</div>' +
+                '<div class="g-value mb-2">' + name + '</div>' +
+                '<div class="g-label">교원 비밀번호</div>' +
+                '<div class="g-value">' + teacherPw + '</div>';
+
+            document.getElementById('copy-guide-btn').innerText = '\ud83d\udccb 안내 문구 복사하기';
+            document.getElementById('created-modal').classList.remove('hidden');
+        }
+
+        function closeCreatedModal() {
+            document.getElementById('created-modal').classList.add('hidden');
+            guideText = '';
+        }
+
+        async function copyGuide() {
+            const btn = document.getElementById('copy-guide-btn');
+            try {
+                await navigator.clipboard.writeText(guideText);
+            } catch (e) {
+                // 클립보드 API를 쓸 수 없는 브라우저용 대체 방식
+                const ta = document.createElement('textarea');
+                ta.value = guideText;
+                ta.style.position = 'fixed';
+                ta.style.opacity = '0';
+                document.body.appendChild(ta);
+                ta.select();
+                try { document.execCommand('copy'); } catch (_) { alert('복사에 실패했습니다. 내용을 직접 선택해 복사해주세요.'); }
+                document.body.removeChild(ta);
+            }
+            btn.innerText = '\u2705 복사되었습니다';
+            setTimeout(() => { btn.innerText = '\ud83d\udccb 안내 문구 복사하기'; }, 2000);
+        }
+
+        // ── 비밀번호 표시 버튼 (누르고 있는 동안만 보임) ──
+        function setupPasswordEyes() {
+            document.querySelectorAll('input[type="password"]').forEach(input => {
+                if (input.dataset.eyeReady) return;
+                input.dataset.eyeReady = '1';
+                input.setAttribute('autocomplete', 'new-password');
+
+                const wrap = document.createElement('div');
+                wrap.className = 'pw-wrap';
+                if (input.classList.contains('mt-1')) {
+                    input.classList.remove('mt-1');
+                    wrap.classList.add('mt-1');
+                }
+                input.parentNode.insertBefore(wrap, input);
+                wrap.appendChild(input);
+                input.classList.add('pr-12');
+
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'pw-eye';
+                btn.setAttribute('aria-label', '누르고 있는 동안 비밀번호 표시');
+                btn.setAttribute('title', '누르고 있는 동안 표시');
+                btn.textContent = '\ud83d\udc41';
+
+                const show = (e) => { e.preventDefault(); input.type = 'text'; btn.classList.add('on'); };
+                const hide = () => { input.type = 'password'; btn.classList.remove('on'); };
+                btn.addEventListener('mousedown', show);
+                btn.addEventListener('touchstart', show, { passive: false });
+                ['mouseup', 'mouseleave', 'touchend', 'touchcancel', 'blur'].forEach(ev => btn.addEventListener(ev, hide));
+                // 손을 뗀 곳이 버튼 밖이어도 반드시 다시 가려지도록
+                document.addEventListener('mouseup', hide);
+                document.addEventListener('touchend', hide);
+
+                wrap.appendChild(btn);
+            });
+        }
+        setupPasswordEyes();
 
         async function loginAdmin() {
             const name = document.getElementById('login-admin-group').value.trim();
