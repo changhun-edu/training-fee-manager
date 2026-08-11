@@ -244,7 +244,7 @@
                     <button id="excel-btn" onclick="downloadExcel()" class="text-xs bg-green-600 text-white px-3 py-2 rounded font-bold hover:bg-green-700 shadow">📥 엑셀 다운로드</button>
                     <button onclick="changeAdminPassword()" class="text-xs bg-gray-600 text-white px-3 py-2 rounded font-bold hover:bg-gray-700 shadow">🔑 관리자 비번</button>
                     <button onclick="changeTeacherPassword()" class="text-xs bg-gray-600 text-white px-3 py-2 rounded font-bold hover:bg-gray-700 shadow">👥 교원 비번</button>
-                    <button onclick="location.reload()" class="text-xs text-red-500 border border-red-500 px-3 py-2 rounded hover:bg-red-50 font-bold">로그아웃</button>
+                    <button onclick="logout()" class="text-xs text-red-500 border border-red-500 px-3 py-2 rounded hover:bg-red-50 font-bold">로그아웃</button>
                 </div>
             </div>
             
@@ -270,7 +270,7 @@
         <div id="screen-user-dashboard" class="hidden w-full flex-col h-full py-4">
             <div class="flex justify-between items-center mb-4 border-b pb-3">
                 <h2 id="display-group-name" class="text-xl md:text-2xl font-bold">그룹명</h2>
-                <button onclick="location.reload()" class="text-xs text-red-500 border border-red-500 px-3 py-2 rounded hover:bg-red-50 font-bold">나가기</button>
+                <button onclick="logout()" class="text-xs text-red-500 border border-red-500 px-3 py-2 rounded hover:bg-red-50 font-bold">나가기</button>
             </div>
             <div class="flex flex-col gap-1 text-sm bg-blue-50 p-4 rounded-lg text-blue-800 mb-4 border border-blue-100">
                 <span class="font-bold">💡 잔액을 모두 사용한 분은 목록에서 숨겨집니다.</span>
@@ -397,8 +397,24 @@
         //    ※ 비밀번호는 소스에 없습니다. Firebase 콘솔에서 관리하세요.
         const SUPER_ADMIN_EMAIL = "superadmin@training-fee.local";
 
-        // 세션을 브라우저에 저장하지 않음 (탭을 닫으면 로그아웃)
-        firebase.auth().setPersistence(firebase.auth.Auth.Persistence.NONE);
+        // 탭이 살아 있는 동안만 로그인 유지 (새로고침·뒤로가기에도 세션 유지, 탭을 닫으면 자동 로그아웃)
+        firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION);
+
+        // 현재 로그인 상태를 탭에 기억해 두었다가 새로고침 시 화면을 복원한다
+        const SESSION_KEY = 'tfm-session';
+        function saveSession(role, groupId) {
+            try { sessionStorage.setItem(SESSION_KEY, JSON.stringify({ role, groupId })); } catch (e) {}
+        }
+        function clearSession() {
+            try { sessionStorage.removeItem(SESSION_KEY); } catch (e) {}
+        }
+
+        // 로그아웃 (세션 기록까지 완전히 제거)
+        async function logout() {
+            clearSession();
+            try { await firebase.auth().signOut(); } catch (e) {}
+            location.href = location.pathname;
+        }
 
         // 🔹 숨겨진 이스터에그 로직 (총괄 관리자 진입)
         let triggerCount = 0;
@@ -420,6 +436,7 @@
             if(!masterPw) return;
             try {
                 await firebase.auth().signInWithEmailAndPassword(SUPER_ADMIN_EMAIL, masterPw);
+                saveSession('super', '');
                 loadSuperAdmin();
             } catch (e) {
                 if (e.code === 'auth/too-many-requests') {
@@ -432,8 +449,7 @@
 
         // 🔹 총괄 관리자 화면 나가기 (반드시 로그아웃 후 새로고침)
         async function exitSuperAdmin() {
-            try { await firebase.auth().signOut(); } catch (e) {}
-            location.reload();
+            await logout();
         }
 
         // 🔹 총괄 관리자 데이터 로드
@@ -531,10 +547,30 @@
             return tail || role;
         }
 
-        function showScreen(screenId) {
+        // 로그인이 필요한 화면 (뒤로가기로 되돌아왔을 때 인증 여부를 다시 확인한다)
+        const PROTECTED_SCREENS = ['screen-admin-dashboard', 'screen-user-dashboard', 'screen-member-form', 'screen-super-admin'];
+
+        function showScreen(screenId, fromHistory = false) {
             document.querySelectorAll('#app > div').forEach(div => div.classList.add('hidden'));
             document.getElementById(screenId).classList.remove('hidden');
+            window.scrollTo(0, 0);
+
+            // 브라우저 뒤로가기가 사이트를 벗어나지 않고 이전 화면으로 이동하도록 기록을 남긴다
+            if (!fromHistory && (!history.state || history.state.screen !== screenId)) {
+                history.pushState({ screen: screenId }, '');
+            }
         }
+
+        // 뒤로가기 / 앞으로가기 처리
+        window.addEventListener('popstate', (e) => {
+            const target = (e.state && e.state.screen) || 'screen-home';
+            // 로그아웃 상태에서 보호 화면으로 돌아가려 하면 첫 화면으로 보낸다
+            if (PROTECTED_SCREENS.includes(target) && !firebase.auth().currentUser) {
+                showScreen('screen-home', true);
+                return;
+            }
+            showScreen(target, true);
+        });
 
         async function createGroup() {
             const name = document.getElementById('admin-group-name').value.trim();
@@ -588,6 +624,7 @@
 
                 alert('그룹이 생성되었습니다!');
                 currentGroupId = groupId;
+                saveSession('admin', groupId);
                 dashboardScreen = 'screen-admin-dashboard';
                 document.getElementById('admin-display-group-name').innerText = name + ' (관리자)';
                 loadAdminDashboard();
@@ -610,6 +647,7 @@
                 if(!doc.exists) return alert('그룹 정보를 찾을 수 없습니다.');
 
                 currentGroupId = groupId;
+                saveSession('admin', groupId);
                 dashboardScreen = 'screen-admin-dashboard';
                 document.getElementById('admin-display-group-name').innerText = doc.data().name + ' (관리자)';
                 loadAdminDashboard();
@@ -647,8 +685,7 @@
             } catch (e) {
                 alert('변경 실패: ' + authErrorMessage(e));
                 // 관리자 세션이 끊겼을 수 있으므로 처음 화면으로 되돌린다
-                try { await firebase.auth().signOut(); } catch (_) {}
-                location.reload();
+                await logout();
             }
         }
 
@@ -771,6 +808,7 @@
                 if(!doc.exists) return alert('그룹 정보를 찾을 수 없습니다.');
 
                 currentGroupId = groupId;
+                saveSession('teacher', groupId);
                 dashboardScreen = 'screen-user-dashboard';
                 document.getElementById('display-group-name').innerText = doc.data().name;
                 loadMembers();
@@ -1063,19 +1101,64 @@
             } catch (e) { alert('엑셀 생성 중 오류: ' + e.message); }
         }
 
-        window.onload = async () => {
-            // 이전 세션이 남아 있지 않도록 시작 시 로그아웃
-            try { await firebase.auth().signOut(); } catch (e) {}
+        // ── 새로고침 / 뒤로가기 후 화면 복원 ──
+        async function restoreSession() {
+            const raw = sessionStorage.getItem(SESSION_KEY);
+            if (!raw) return false;
+            let saved;
+            try { saved = JSON.parse(raw); } catch (e) { return false; }
+
+            try {
+                if (saved.role === 'super') {
+                    loadSuperAdmin();
+                    return true;
+                }
+
+                const doc = await db.collection('groups').doc(saved.groupId).get();
+                if (!doc.exists) return false;
+
+                currentGroupId = saved.groupId;
+                if (saved.role === 'admin') {
+                    dashboardScreen = 'screen-admin-dashboard';
+                    document.getElementById('admin-display-group-name').innerText = doc.data().name + ' (관리자)';
+                    loadAdminDashboard();
+                    showScreen('screen-admin-dashboard');
+                } else {
+                    dashboardScreen = 'screen-user-dashboard';
+                    document.getElementById('display-group-name').innerText = doc.data().name;
+                    loadMembers();
+                    showScreen('screen-user-dashboard');
+                }
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        let sessionChecked = false;
+        firebase.auth().onAuthStateChanged(async (user) => {
+            if (sessionChecked) return;   // 최초 1회만 복원 (비밀번호 변경 등으로 재로그인할 때는 무시)
+            sessionChecked = true;
+
+            if (user && await restoreSession()) return;
+
+            // 복원할 세션이 없으면 첫 화면으로
+            clearSession();
+            showScreen('screen-home', true);
 
             // ?group=그룹명 으로 접속하면 그룹명만 미리 채우고 비밀번호를 받는다
             const params = new URLSearchParams(window.location.search);
             const g = params.get('group');
-            if(g) {
+            if (g) {
                 document.getElementById('user-group-name').value = decodeURIComponent(g);
                 showScreen('screen-user-start');
                 document.getElementById('user-group-pw').focus();
             }
-        };
+        });
+
+        // 첫 진입 기록 (뒤로가기로 홈까지 되돌아올 수 있도록)
+        history.replaceState({ screen: 'screen-home' }, '');
+
     </script>
 </body>
 </html>
