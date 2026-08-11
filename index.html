@@ -289,7 +289,9 @@
                     <button onclick="logout()" class="text-xs text-red-500 border border-red-500 px-3 py-2 rounded hover:bg-red-50 font-bold">로그아웃</button>
                 </div>
             </div>
-            
+
+            <div id="retention-notice" class="hidden bg-amber-50 border border-amber-200 text-amber-900 rounded-lg p-3 text-sm mb-4"></div>
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div class="bg-gray-800 text-white p-4 rounded-lg shadow flex flex-col justify-center">
                     <div class="text-sm text-gray-300">그룹 전체 사용 현황</div>
@@ -383,6 +385,14 @@
                 이곳은 개발자/시스템 총괄 관리자 전용 화면입니다.<br>
                 생성된 모든 학교(그룹) 목록을 확인하거나 <b>그룹을 통째로 강제 삭제</b>할 수 있습니다.<br>
                 <span class="text-xs">※ 비밀번호는 서버에 암호화되어 저장되므로 이곳에서도 확인할 수 없습니다.</span>
+            </div>
+            <div id="super-bulk-bar" class="hidden sticky top-0 z-10 bg-white border border-purple-200 rounded-lg p-3 mb-3 flex flex-wrap items-center gap-2 shadow-sm">
+                <label class="flex items-center gap-2 text-sm font-bold text-gray-700 cursor-pointer">
+                    <input type="checkbox" id="super-check-expired" class="w-4 h-4" onclick="selectExpiredGroups(this.checked)">
+                    지난 학년도 전체 선택
+                </label>
+                <span id="super-selected-count" class="text-sm text-gray-500">선택 0개</span>
+                <button onclick="bulkDeleteGroups()" class="ml-auto bg-red-600 text-white px-4 py-2 rounded text-sm font-bold hover:bg-red-700 disabled:opacity-40" id="super-bulk-del">선택한 그룹 삭제</button>
             </div>
             <div id="super-admin-list" class="space-y-3">
                 </div>
@@ -512,34 +522,119 @@
         }
 
         // 🔹 총괄 관리자 데이터 로드
+        // ── 학년도 계산 (3월 시작 ~ 다음 해 2월 종료) ──
+        // 2026년 8월 생성 → 2026학년도 → 2027년 3월 1일부터 '지난 학년도'
+        function academicYearOf(date) {
+            return date.getMonth() + 1 >= 3 ? date.getFullYear() : date.getFullYear() - 1;
+        }
+        function expiryDateOf(date) {
+            return new Date(academicYearOf(date) + 1, 2, 1); // 다음 학년도 3월 1일
+        }
+        function isExpiredGroup(date) {
+            return new Date() >= expiryDateOf(date);
+        }
+
         async function loadSuperAdmin() {
             showScreen('screen-super-admin');
             const listDiv = document.getElementById('super-admin-list');
+            const bulkBar = document.getElementById('super-bulk-bar');
             listDiv.innerHTML = '<div class="text-center py-10 text-gray-500">데이터를 불러오는 중...</div>';
+            bulkBar.classList.add('hidden');
 
             try {
                 const snapshot = await db.collection('groups').get();
                 listDiv.innerHTML = '';
                 if(snapshot.empty) return listDiv.innerHTML = '<div class="text-center py-10 text-gray-500">생성된 그룹이 없습니다.</div>';
 
+                const expired = [], current = [];
                 snapshot.forEach(doc => {
                     const data = doc.data();
-                    const div = document.createElement('div');
-                    div.className = 'bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex justify-between items-center';
-                    div.innerHTML = `
-                        <div class="flex flex-col">
-                            <span class="font-bold text-lg text-gray-800">${data.name} <span class="text-xs text-gray-400 font-normal ml-1">(ID: ${doc.id})</span></span>
-                            <span class="text-xs text-gray-500 mt-1">생성일: ${data.createdAt ? data.createdAt.toDate().toLocaleDateString('ko-KR') : '-'}</span>
-                        </div>
-                        <button id="super-del-${doc.id}" class="bg-red-50 text-red-600 border border-red-200 px-3 py-2 rounded text-sm font-bold hover:bg-red-100 transition-colors">전체 삭제</button>
-                    `;
-                    listDiv.appendChild(div);
-
-                    document.getElementById(`super-del-${doc.id}`).onclick = () => superDeleteGroup(doc.id, data.name);
+                    const created = data.createdAt ? data.createdAt.toDate() : new Date();
+                    const item = { id: doc.id, name: data.name, created: created, year: academicYearOf(created) };
+                    (isExpiredGroup(created) ? expired : current).push(item);
                 });
+                const byYear = (a, b) => (a.year - b.year) || a.name.localeCompare(b.name, 'ko');
+                expired.sort(byYear);
+                current.sort(byYear);
+
+                document.getElementById('super-check-expired').checked = false;
+                bulkBar.classList.remove('hidden');
+
+                renderGroupSection(listDiv, '지난 학년도 그룹', expired, true);
+                renderGroupSection(listDiv, '현재 학년도 그룹', current, false);
+                updateSelectedCount();
             } catch(e) {
                 listDiv.innerHTML = `<div class="text-red-500 text-center">오류 발생: ${e.message}</div>`;
             }
+        }
+
+        function renderGroupSection(listDiv, title, groups, isExpired) {
+            const header = document.createElement('div');
+            header.className = 'flex items-center gap-2 mt-5 mb-2';
+            header.innerHTML = `
+                <h3 class="font-bold ${isExpired ? 'text-red-700' : 'text-gray-700'}">${title}</h3>
+                <span class="text-xs ${isExpired ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-600'} px-2 py-0.5 rounded-full font-bold">${groups.length}개</span>
+            `;
+            listDiv.appendChild(header);
+
+            if (groups.length === 0) {
+                const empty = document.createElement('div');
+                empty.className = 'text-sm text-gray-400 py-3';
+                empty.innerText = '해당하는 그룹이 없습니다.';
+                listDiv.appendChild(empty);
+                return;
+            }
+
+            groups.forEach(g => {
+                const div = document.createElement('div');
+                div.className = `bg-white p-4 rounded-lg shadow-sm border ${isExpired ? 'border-red-200' : 'border-gray-200'} flex items-center gap-3`;
+                div.innerHTML = `
+                    <input type="checkbox" class="group-check w-4 h-4 shrink-0" data-id="${g.id}" data-name="${g.name}" data-expired="${isExpired ? '1' : '0'}">
+                    <div class="flex flex-col flex-1 min-w-0">
+                        <span class="font-bold text-lg text-gray-800 truncate">${g.name}</span>
+                        <span class="text-xs text-gray-500 mt-1">${g.year}학년도 · 생성일 ${g.created.toLocaleDateString('ko-KR')}</span>
+                    </div>
+                    <button id="super-del-${g.id}" class="bg-red-50 text-red-600 border border-red-200 px-3 py-2 rounded text-sm font-bold hover:bg-red-100 transition-colors shrink-0">삭제</button>
+                `;
+                listDiv.appendChild(div);
+                div.querySelector('.group-check').addEventListener('change', updateSelectedCount);
+                document.getElementById(`super-del-${g.id}`).onclick = () => superDeleteGroup(g.id, g.name);
+            });
+        }
+
+        function updateSelectedCount() {
+            const n = document.querySelectorAll('.group-check:checked').length;
+            document.getElementById('super-selected-count').innerText = `선택 ${n}개`;
+            document.getElementById('super-bulk-del').disabled = (n === 0);
+        }
+
+        function selectExpiredGroups(checked) {
+            document.querySelectorAll('.group-check[data-expired="1"]').forEach(cb => { cb.checked = checked; });
+            updateSelectedCount();
+        }
+
+        // 🔹 총괄 관리자: 선택한 그룹 일괄 삭제
+        async function bulkDeleteGroups() {
+            const checked = Array.from(document.querySelectorAll('.group-check:checked'));
+            if (checked.length === 0) return;
+
+            const names = checked.map(cb => cb.dataset.name);
+            const preview = names.slice(0, 10).join('\n') + (names.length > 10 ? `\n… 외 ${names.length - 10}개` : '');
+            const word = prompt(`선택한 ${names.length}개 그룹과 모든 지출 내역을 삭제합니다.\n이 작업은 복구할 수 없습니다.\n\n${preview}\n\n진행하려면 '삭제' 라고 입력해주세요.`);
+            if (word !== '삭제') return;
+
+            const bar = document.getElementById('super-selected-count');
+            let done = 0, failed = [];
+            for (const cb of checked) {
+                bar.innerText = `삭제 중… (${done + 1}/${checked.length})`;
+                const ok = await deleteGroupData(cb.dataset.id);
+                if (ok) done++; else failed.push(cb.dataset.name);
+            }
+
+            alert(failed.length === 0
+                ? `${done}개 그룹을 삭제했습니다.`
+                : `${done}개 삭제 완료.\n실패: ${failed.join(', ')}`);
+            loadSuperAdmin();
         }
 
         // 🔹 총괄 관리자: 특정 그룹 강제 일괄 삭제
@@ -547,25 +642,34 @@
             const confirmWord = prompt(`정말로 [${groupName}] 그룹과 모든 선생님들의 데이터를 삭제하시겠습니까?\n이 작업은 복구할 수 없습니다.\n\n진행하시려면 '삭제' 라고 입력해주세요.`);
             if(confirmWord !== '삭제') return;
 
+            alert('삭제를 시작합니다. 데이터 양에 따라 수 초가 걸릴 수 있습니다.');
+            const ok = await deleteGroupData(groupId);
+            alert(ok ? `[${groupName}] 그룹이 완전히 삭제되었습니다.` : `[${groupName}] 삭제 중 오류가 발생했습니다.`);
+            loadSuperAdmin();
+        }
+
+        // 그룹 하나를 통째로 삭제 (지출 내역 → 명단 → 그룹 순)
+        async function deleteGroupData(groupId) {
             try {
-                alert('삭제를 시작합니다. 데이터 양에 따라 수 초가 걸릴 수 있습니다.');
                 const groupRef = db.collection('groups').doc(groupId);
                 const membersSnapshot = await groupRef.collection('members').get();
-                
-                // Firestore Batch 제한(500개)을 고려하여 순차적 삭제 (프론트엔드 방식)
+
+                // Firestore Batch 제한(500개)을 고려하여 순차적으로 삭제
                 for (let memberDoc of membersSnapshot.docs) {
                     const expensesSnapshot = await memberDoc.ref.collection('expenses').get();
-                    const batch = db.batch();
-                    expensesSnapshot.forEach(expDoc => batch.delete(expDoc.ref));
-                    await batch.commit(); // 지출 내역 먼저 삭제
-                    await memberDoc.ref.delete(); // 멤버 삭제
+                    if (!expensesSnapshot.empty) {
+                        const batch = db.batch();
+                        expensesSnapshot.forEach(expDoc => batch.delete(expDoc.ref));
+                        await batch.commit();
+                    }
+                    await memberDoc.ref.delete();
                 }
-                
-                await groupRef.delete(); // 마지막으로 그룹 본체 삭제
-                alert(`[${groupName}] 그룹이 완전히 삭제되었습니다.`);
-                loadSuperAdmin(); // 목록 새로고침
+
+                await groupRef.delete();
+                return true;
             } catch (e) {
-                alert('삭제 중 오류가 발생했습니다: ' + e.message);
+                console.error('그룹 삭제 실패:', groupId, e);
+                return false;
             }
         }
 
@@ -702,7 +806,7 @@
                 });
                 await batch.commit();
 
-                enterAdminGroup(groupId, name);
+                enterAdminGroup(groupId, name, new Date());
                 openCreatedModal(name, teacherPw);
             } catch (e) { alert(authErrorMessage(e)); }
         }
@@ -716,13 +820,31 @@
         }
 
         // 관리자 화면 진입 (공통)
-        function enterAdminGroup(groupId, name) {
+        function enterAdminGroup(groupId, name, createdAt) {
             currentGroupId = groupId;
             saveSession('admin', groupId);
             dashboardScreen = 'screen-admin-dashboard';
             document.getElementById('admin-display-group-name').innerText = name + ' (관리자)';
+            showRetentionNotice(createdAt);
             loadAdminDashboard();
             showScreen('screen-admin-dashboard');
+        }
+
+        // 학년도 종료 후 삭제된다는 안내
+        function showRetentionNotice(createdAt) {
+            const box = document.getElementById('retention-notice');
+            if (!createdAt) { box.classList.add('hidden'); return; }
+
+            const year = academicYearOf(createdAt);
+            const expiry = expiryDateOf(createdAt);
+            const expired = new Date() >= expiry;
+
+            box.innerHTML = expired
+                ? `<b>\u26a0\ufe0f ${year}학년도 그룹입니다.</b> 학년도가 종료되어 <b>언제든 삭제될 수 있습니다.</b>
+                   아직 내려받지 않으셨다면 지금 바로 <b>엑셀 다운로드</b>로 자료를 보관해 주세요.`
+                : `<b>\ud83d\udcc5 ${year}학년도 그룹입니다.</b> 이 그룹의 자료는 <b>${expiry.getFullYear()}년 3월</b> 이후 지난 학년도로 분류되어 삭제될 수 있습니다.
+                   학년도가 끝나기 전에 <b>엑셀 다운로드</b>로 자료를 보관해 주세요.`;
+            box.classList.remove('hidden');
         }
 
         // ── 그룹 생성 완료 안내 카드 ──
@@ -832,7 +954,11 @@
             for (const id of ids) {
                 try {
                     const doc = await db.collection('groups').doc(id).get();
-                    if (doc.exists) groups.push({ id: id, name: doc.data().name });
+                    if (doc.exists) groups.push({
+                        id: id,
+                        name: doc.data().name,
+                        created: doc.data().createdAt ? doc.data().createdAt.toDate() : null
+                    });
                 } catch (_) {}
             }
 
@@ -842,7 +968,7 @@
                 return;
             }
             if (groups.length === 1) {
-                enterAdminGroup(groups[0].id, groups[0].name);
+                enterAdminGroup(groups[0].id, groups[0].name, groups[0].created);
                 return;
             }
 
@@ -852,7 +978,7 @@
                 const btn = document.createElement('button');
                 btn.className = 'card w-full p-4 text-left font-bold text-gray-800 hover:bg-blue-50 transition-all';
                 btn.innerText = g.name;
-                btn.onclick = () => enterAdminGroup(g.id, g.name);
+                btn.onclick = () => enterAdminGroup(g.id, g.name, g.created);
                 listDiv.appendChild(btn);
             });
             showScreen('screen-group-select');
@@ -1338,10 +1464,8 @@
 
                 currentGroupId = saved.groupId;
                 if (saved.role === 'admin') {
-                    dashboardScreen = 'screen-admin-dashboard';
-                    document.getElementById('admin-display-group-name').innerText = doc.data().name + ' (관리자)';
-                    loadAdminDashboard();
-                    showScreen('screen-admin-dashboard');
+                    enterAdminGroup(saved.groupId, doc.data().name,
+                        doc.data().createdAt ? doc.data().createdAt.toDate() : null);
                 } else {
                     dashboardScreen = 'screen-user-dashboard';
                     document.getElementById('display-group-name').innerText = doc.data().name;
