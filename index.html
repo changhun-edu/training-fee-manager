@@ -132,6 +132,54 @@
         .trust-row { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
         .trust-chip { display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700; color: #475569; background: #fff; border: 1.5px solid #e2e8f0; padding: 6px 12px; border-radius: 99px; }
 
+        /* 기존 그룹 사용 기한 안내 */
+        .lg-warn { border-radius: 12px; padding: 14px 16px; border: 2px solid; }
+        .lg-warn > b { display: block; font-size: 14px; font-weight: 800; margin-bottom: 6px; }
+        .lg-warn p { font-size: 12.5px; line-height: 1.65; margin: 0 0 10px; word-break: keep-all; }
+        .lg-ok   { background: #eff6ff; border-color: #bfdbfe; color: #1e3a8a; }
+        .lg-soon { background: #fffbeb; border-color: #fcd34d; color: #78350f; }
+        .lg-over { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
+        .lg-btn { display: inline-block; background: #1d4ed8; color: #fff; padding: 8px 14px;
+                  border-radius: 8px; font-size: 12.5px; font-weight: 800; text-decoration: none; }
+        .lg-btn:hover { background: #1e3a8a; }
+
+        /* 체험 안내 */
+        .demo-box { background: #fff; border: 2px solid #fcd34d; border-radius: 16px; padding: 18px; position: relative; }
+        .db-badge { position: absolute; top: -11px; left: 16px; background: #f59e0b; color: #fff;
+                    font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 99px; letter-spacing: .5px; }
+        .db-lead { font-size: 13px; color: #78350f; line-height: 1.7; margin: 6px 0 12px; word-break: keep-all; }
+        .db-key { background: #fffbeb; border-radius: 10px; padding: 12px 14px; margin-bottom: 12px; }
+        .dbk-t { font-size: 11px; font-weight: 800; color: #92400e; letter-spacing: .5px; margin-bottom: 7px; }
+        .dbk-r { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 3px 0; }
+        .dbk-r span { font-size: 12px; color: #a16207; }
+        .dbk-r b { font-size: 13px; color: #78350f; font-family: ui-monospace, Menlo, monospace; word-break: break-all; }
+        .db-try { display: flex; gap: 8px; margin-bottom: 14px; }
+        .dbt-btn { flex: 1; background: #fff; border: 1.5px solid #fcd34d; color: #92400e;
+                   font-size: 13px; font-weight: 700; padding: 10px 6px; border-radius: 9px; }
+        .dbt-btn:hover { background: #fffbeb; }
+        .db-go { font-size: 13px; color: #334155; line-height: 1.7; margin: 0 0 12px;
+                 padding-top: 12px; border-top: 1px dashed #fde68a; word-break: keep-all; }
+        .db-btn { display: block; text-align: center; background: #1d4ed8; color: #fff; padding: 12px;
+                  border-radius: 10px; font-weight: 800; font-size: 14px; text-decoration: none; }
+        .db-btn:hover { background: #1e3a8a; }
+
+        /* 관리자 메뉴 - 생성 잠금 안내 */
+        .demo-lock { background: #fffbeb; border: 2px solid #fcd34d; border-radius: 14px;
+                     padding: 16px; text-align: left; }
+        .demo-lock .dl-title { font-size: 14px; font-weight: 800; color: #92400e; margin-bottom: 8px; }
+        .demo-lock p { font-size: 12.5px; color: #78350f; line-height: 1.7; margin: 0 0 8px; word-break: keep-all; }
+        .demo-lock .dl-go { color: #334155; }
+        .dl-btn { display: block; text-align: center; background: #1d4ed8; color: #fff; padding: 11px;
+                  border-radius: 9px; font-weight: 800; font-size: 13.5px; text-decoration: none; margin-top: 10px; }
+        .dl-btn:hover { background: #1e3a8a; }
+
+        /* 그룹명·비밀번호 보관 경고 */
+        .keep-warn { background: #fffbeb; border: 2px solid #fcd34d; border-radius: 12px; padding: 14px 16px; }
+        .keep-warn .kw-title { font-size: 14px; font-weight: 800; color: #92400e; margin-bottom: 8px; }
+        .keep-warn p { font-size: 12.5px; color: #78350f; line-height: 1.65; margin-bottom: 6px; word-break: keep-all; }
+        .keep-warn p:last-child { margin-bottom: 0; }
+        .keep-warn .kw-todo { background: #fef3c7; border-radius: 8px; padding: 8px 10px; margin-top: 8px; }
+
         /* 총괄 화면 - 그룹별 계정 표시 */
         .acct-box { margin-top: 8px; display: flex; flex-direction: column; gap: 4px; }
         .acct-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
@@ -191,13 +239,34 @@
                 </div>
             </div>
 
+            <!-- 체험 안내 -->
+            <div class="demo-box">
+                <div class="db-badge">체험용</div>
+                <p class="db-lead">이 사이트는 <b>어떻게 돌아가는지 직접 써 보시는 곳</b>입니다.
+                   아무나 들어와 볼 수 있으니 <b>실제 자료는 넣지 말아 주세요.</b>
+                   입력하신 내용은 예고 없이 지워집니다.</p>
+                <div class="db-key">
+                    <div class="dbk-t">체험 계정</div>
+                    <div class="dbk-r"><span>그룹명</span><b id="demo-group">—</b></div>
+                    <div class="dbk-r"><span>교원 비밀번호</span><b id="demo-tpw">—</b></div>
+                    <div class="dbk-r"><span>관리자 비밀번호</span><b id="demo-apw">—</b></div>
+                </div>
+                <div class="db-try">
+                    <button onclick="enterDemo('teacher')" class="dbt-btn">👤 교원으로 체험</button>
+                    <button onclick="enterDemo('admin')" class="dbt-btn">👑 담당자로 체험</button>
+                </div>
+                <p class="db-go">써 보시고 괜찮으면, <b>우리 학교 계정에 설치</b>해 운영하세요.
+                   자료가 학교 밖으로 나가지 않습니다.</p>
+                <a id="install-link" href="#" target="_blank" rel="noopener" class="db-btn">📦 우리 학교에 설치하기</a>
+            </div>
+
             <!-- 역할 선택 -->
             <div class="space-y-3">
                 <button onclick="showScreen('screen-admin-menu')" class="role-card admin">
                     <div class="rc-icon">👑</div>
                     <div class="rc-body">
-                        <h3>관리자로 시작</h3>
-                        <p>그룹 생성·명단 관리·전체 현황 확인</p>
+                        <h3>관리자로 둘러보기</h3>
+                        <p>명단 관리·전체 현황·엑셀 내려받기</p>
                     </div>
                     <div class="rc-arrow">›</div>
                 </button>
@@ -216,7 +285,7 @@
                 <h4>사용 순서</h4>
                 <div class="step-row">
                     <div class="step-num">1</div>
-                    <div class="step-text"><strong>관리자</strong>가 그룹을 생성하고 비밀번호를 설정합니다</div>
+                    <div class="step-text"><strong>담당자</strong>가 학교 계정에 설치하고 비밀번호를 정합니다</div>
                 </div>
                 <div class="step-row">
                     <div class="step-num">2</div>
@@ -246,10 +315,12 @@
                     <dl>
                         <dt>수집하는 항목</dt>
                         <dd>
-                            · 관리자: <b>이메일 주소</b>(비밀번호 재설정용), 그룹명<br>
-                            · 교원: <b>이름</b>, 담당(학년·반 등), 본인 확인용 <b>비밀번호</b>(실수 방지용, 암호화하지 않고 저장)<br>
-                            · 정산 자료: 지출 항목명, 금액, 분류, 입력 일시<br>
-                            <b>주민등록번호·연락처·계좌번호·카드번호는 수집하지 않습니다.</b>
+                            · 그룹: 그룹명, 접속용 비밀번호<br>
+                            · 교원: 담당(학년·반 등), 본인 확인용 비밀번호<br>
+                            · 정산 자료: 지출 항목명, 금액, 분류, 입력 일시<br><br>
+                            <b>이름·이메일 주소를 수집하지 않습니다.</b> 명단은 '1학년 1반'처럼 담당으로만 관리하며,
+                            로그인에도 이메일을 쓰지 않습니다. 주민등록번호·연락처·계좌번호·카드번호도 수집하지 않습니다.<br>
+                            즉 <b>이 서비스에 저장되는 자료만으로는 개인을 특정할 수 없습니다.</b>
                         </dd>
 
                         <dt>이용 목적</dt>
@@ -257,11 +328,21 @@
 
                         <dt>누가 볼 수 있나요</dt>
                         <dd>
-                            정산 현황을 함께 확인하는 도구이므로, <b>같은 그룹에 접속한 선생님들은 서로의 이름·담당·집행 현황과 지출 항목을 볼 수 있습니다.</b>
-                            이름 옆의 개인 비밀번호는 <b>다른 분이 실수로 남의 칸에 입력하는 것을 막기 위한 장치이며, 서로의 내역을 가려주지는 않습니다.</b>
-                            따라서 다른 곳에서 쓰는 비밀번호를 그대로 사용하지 마시고, 지출 항목명에는 알려지길 원치 않는 내용을 적지 말아 주세요.
-                            같은 그룹에서는 담당자의 이메일 주소도 확인할 수 있습니다.
+                            명단 화면에는 <b>담당(학년·반)만 표시</b>되며, 지출 내역은 본인이 정한 비밀번호를 입력해야 열립니다.
                             다른 학교(그룹)의 자료는 서로 볼 수 없습니다.
+                            이 비밀번호는 다른 곳에서 쓰는 것을 그대로 사용하지 마시고,
+                            지출 항목명에는 알려지길 원치 않는 내용을 적지 말아 주세요.
+                        </dd>
+
+                        <dt>국외 이전</dt>
+                        <dd>
+                            · 이전받는 자: <b>Google LLC</b> (Google Firebase)<br>
+                            · 이전 국가: <b>미국</b> 등 Google이 운영하는 데이터센터 소재 국가<br>
+                            · 이전 시기·방법: 서비스 이용 시점에 <b>정보통신망을 통해 전송</b><br>
+                            · 이전 항목: 그룹명, 담당(학년·반), 접속용·본인 확인용 비밀번호, 지출 내역<br>
+                            · 이용 목적 및 보유 기간: 자료의 저장·조회, 학년도 종료 후 삭제<br>
+                            · 거부 방법과 효과: 이 서비스를 이용하지 않으시면 되며,
+                            이 경우 기존의 종이·엑셀 방식으로 정산하실 수 있습니다.
                         </dd>
 
                         <dt>보관 장소</dt>
@@ -302,8 +383,14 @@
 
         <div id="screen-admin-menu" class="hidden max-w-md w-full mx-auto space-y-4 text-center">
             <h2 class="text-2xl font-bold mb-6">관리자 메뉴</h2>
-            <button onclick="showScreen('screen-admin-start')" class="btn-primary w-full py-4">✨ 새로운 그룹 만들기</button>
-            <button onclick="showScreen('screen-admin-login')" class="bg-gray-800 text-white w-full py-4 rounded-lg font-bold hover:bg-gray-700">🔒 기존 그룹 관리 (로그인)</button>
+            <div class="demo-lock">
+                <div class="dl-title">🔒 새 그룹 만들기는 닫혀 있습니다</div>
+                <p>이곳은 <b>체험용 사이트</b>입니다. 아래 체험 계정으로 관리자 화면을 둘러보실 수 있습니다.</p>
+                <p class="dl-go">우리 학교에서 실제로 쓰시려면 <b>설치본</b>을 받아 학교 계정에 설치하세요.
+                   자료가 학교 안에만 저장됩니다.</p>
+                <a id="install-link-2" href="#" target="_blank" rel="noopener" class="dl-btn">📦 설치본 받기</a>
+            </div>
+            <button onclick="showScreen('screen-admin-login')" class="bg-gray-800 text-white w-full py-4 rounded-lg font-bold hover:bg-gray-700">🔒 체험용 그룹 관리 (로그인)</button>
             <button onclick="showScreen('screen-home')" class="w-full text-gray-500 py-2 mt-4 hover:underline">뒤로가기</button>
         </div>
 
@@ -315,20 +402,25 @@
                 <p class="text-xs text-red-500 mt-1 font-semibold">※ 너무 쉬운 그룹명을 사용하면 임의의 다른 사람이 접속할 수 있으니 숫자 등을 조합해 주세요.</p>
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700">관리자 이메일</label>
-                <input type="email" id="admin-email" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3 border focus:ring-blue-500 focus:border-blue-500" placeholder="example@school.kr" autocomplete="email">
-                <p class="text-xs text-blue-600 mt-1 font-semibold">※ 비밀번호를 잊었을 때 재설정 메일을 받는 주소입니다. 반드시 본인이 확인 가능한 주소를 정확히 입력하세요.</p>
-            </div>
-            <div>
                 <label class="block text-sm font-medium text-gray-700">관리자 비밀번호</label>
-                <input type="password" id="admin-password" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3 border focus:ring-blue-500 focus:border-blue-500" placeholder="6자 이상 설정">
+                <input type="password" id="admin-password" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3 border focus:ring-blue-500 focus:border-blue-500" placeholder="8자 이상, 문자·숫자·기호 조합">
                 <p class="text-xs text-gray-500 mt-1">관리자 본인만 사용합니다. 명단 관리·엑셀 다운로드 권한.</p>
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700">교원 안내용 비밀번호</label>
-                <input type="password" id="teacher-password" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3 border focus:ring-blue-500 focus:border-blue-500" placeholder="6자 이상 설정">
+                <input type="password" id="teacher-password" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3 border focus:ring-blue-500 focus:border-blue-500" placeholder="8자 이상, 문자·숫자·기호 조합">
                 <p class="text-xs text-gray-500 mt-1">선생님들께 그룹명과 함께 안내할 비밀번호입니다. 관리자 비밀번호와 다르게 정하세요.</p>
             </div>
+
+            <div class="keep-warn">
+                <div class="kw-title">✍️ 그룹명과 비밀번호를 꼭 적어 두세요</div>
+                <p>이 서비스는 <b>이메일 주소를 받지 않습니다.</b> 개인정보를 남기지 않기 위해서입니다.</p>
+                <p>대신 <b>비밀번호를 대신 찾아 드릴 방법이 없습니다.</b>
+                   그룹명이나 비밀번호를 잊으면 그 그룹의 자료를 다시는 열 수 없습니다.</p>
+                <p class="kw-todo">업무 수첩이나 인수인계 문서에 <b>그룹명 · 관리자 비밀번호 · 교원 비밀번호</b> 세 가지를 적어 두시고,
+                   정산 회차마다 <b>엑셀로 내려받아</b> 보관해 주세요.</p>
+            </div>
+
             <button onclick="createGroup()" class="btn-primary w-full py-3 mt-2">그룹 생성 및 관리 시작</button>
             <button onclick="showScreen('screen-admin-menu')" class="text-center w-full text-gray-500 py-2 hover:underline">뒤로가기</button>
         </div>
@@ -336,15 +428,18 @@
         <div id="screen-admin-login" class="hidden max-w-md w-full mx-auto space-y-4">
             <h2 class="text-2xl font-bold mb-4">관리자 로그인</h2>
             <div>
-                <label class="block text-sm font-medium text-gray-700">관리자 이메일</label>
-                <input type="email" id="login-admin-email" class="mt-1 block w-full border-gray-300 rounded-md p-3 border focus:ring-blue-500 focus:border-blue-500" placeholder="example@school.kr" autocomplete="email">
+                <label class="block text-sm font-medium text-gray-700">그룹명</label>
+                <input type="text" id="login-group-name" class="mt-1 block w-full border-gray-300 rounded-md p-3 border focus:ring-blue-500 focus:border-blue-500" placeholder="그룹 생성 때 정한 이름">
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700">관리자 비밀번호</label>
                 <input type="password" id="login-admin-pw" class="mt-1 block w-full border-gray-300 rounded-md p-3 border focus:ring-blue-500 focus:border-blue-500" placeholder="비밀번호 입력">
             </div>
             <button onclick="loginAdmin()" class="bg-gray-800 text-white w-full py-3 rounded-lg font-bold hover:bg-gray-700 mt-2">로그인</button>
-            <button onclick="sendResetMail()" class="w-full text-blue-600 text-sm py-2 hover:underline font-semibold">비밀번호를 잊으셨나요?</button>
+            <p class="text-xs text-gray-500 text-center leading-relaxed pt-1">
+                이메일을 받지 않으므로 <b>비밀번호를 대신 찾아 드릴 수 없습니다.</b><br>
+                적어 두신 곳을 확인해 주세요.
+            </p>
             <button onclick="showScreen('screen-admin-menu')" class="w-full text-gray-500 py-2 hover:underline">뒤로가기</button>
         </div>
 
@@ -390,10 +485,10 @@
                 <div class="bg-white p-4 rounded-lg shadow border border-gray-200 flex flex-col justify-center">
                     <div class="text-sm font-bold text-gray-700 mb-2">➕ 새 명단 추가</div>
                     <div class="flex gap-2">
-                        <input type="text" id="new-member-role" class="w-24 p-2 text-sm border rounded focus:ring-blue-500" placeholder="구분 (예: 1학년 4반)">
-                        <input type="text" id="new-member-name" class="flex-1 p-2 text-sm border rounded focus:ring-blue-500" placeholder="이름 (선택)">
+                        <input type="text" id="new-member-role" class="flex-1 p-2 text-sm border rounded focus:ring-blue-500" placeholder="구분 (예: 1학년 4반)">
                         <button onclick="addMember()" class="bg-blue-500 text-white px-4 py-2 rounded text-sm font-bold hover:bg-blue-600">추가</button>
                     </div>
+                    <p class="text-xs text-gray-400 mt-2">※ 개인정보를 줄이기 위해 이름은 받지 않습니다. 담당(학년·반)만 적어 주세요.</p>
                 </div>
             </div>
 
@@ -406,6 +501,7 @@
                 <h2 id="display-group-name" class="text-xl md:text-2xl font-bold">그룹명</h2>
                 <button onclick="logout()" class="text-xs text-red-500 border border-red-500 px-3 py-2 rounded hover:bg-red-50 font-bold">나가기</button>
             </div>
+            <div id="user-legacy-notice" class="hidden mb-4"></div>
             <div class="flex flex-col gap-1 text-sm bg-blue-50 p-4 rounded-lg text-blue-800 mb-4 border border-blue-100">
                 <span class="font-bold">💡 잔액을 모두 사용한 분은 목록에서 숨겨집니다.</span>
                 <span>🔒 본인 이름을 처음 클릭할 때 비밀번호를 설정합니다.</span>
@@ -480,7 +576,8 @@
                 <span class="text-xs">※ 허용된 구글 계정으로만 들어올 수 있습니다. 그룹 접속 비밀번호는 암호화되어 저장되므로 이곳에서도 확인할 수 없지만, 교원 개인의 '본인 확인용 비밀번호'는 평문으로 저장되니 취급에 유의하세요.</span>
                 <div class="mt-3 pt-3 border-t border-purple-200 text-xs leading-relaxed">
                     <b>🔑 그룹을 삭제한 뒤에는</b> 아래 표시된 계정 두 개가 로그인 정보에 그대로 남습니다.
-                    같은 그룹명·같은 이메일로 다시 만들려면
+                    (그룹명에서 만들어진 가상 주소이며 실제 메일 주소가 아닙니다.)
+                    같은 그룹명으로 다시 만들려면
                     <a href="https://console.firebase.google.com/project/training-fee-manager/authentication/users" target="_blank" rel="noopener" class="underline font-bold">Firebase 콘솔 → Authentication → Users</a>에서
                     해당 계정을 찾아 직접 삭제해 주세요. <b>삭제하기 전에 주소를 복사해 두시면 편합니다.</b>
                 </div>
@@ -491,6 +588,7 @@
                     지난 학년도 전체 선택
                 </label>
                 <span id="super-selected-count" class="text-sm text-gray-500">선택 0개</span>
+                <button onclick="clearDemoGroup()" class="bg-amber-500 text-white px-4 py-2 rounded text-sm font-bold hover:bg-amber-600">🧹 체험 그룹 비우기</button>
                 <button onclick="bulkDeleteGroups()" class="ml-auto bg-red-600 text-white px-4 py-2 rounded text-sm font-bold hover:bg-red-700 disabled:opacity-40" id="super-bulk-del">선택한 그룹 삭제</button>
             </div>
             <div id="super-admin-list" class="space-y-3">
@@ -534,24 +632,89 @@
         //  그룹명을 SHA-256으로 변환해 계정 주소를 만든다.
         //  → 한글 그룹명도 안전하게 처리되고, 주소만 봐서는 그룹명을 알 수 없다.
         // ─────────────────────────────────────────────────────────
+        /* ══════════════════════════════════════════════════════════════
+           체험용 사이트 설정  ─ 여기만 고치시면 됩니다
+
+           이 사이트는 '어떻게 돌아가는지 보여 주는 곳'입니다.
+           새 그룹 만들기는 닫혀 있고, 아래 체험 계정 하나만 공개합니다.
+           실제 운영을 원하는 학교는 설치본을 받아 자기 계정에 설치합니다.
+           ══════════════════════════════════════════════════════════════ */
+        const DEMO = {
+            group:     '체험용 운남초',          // 미리 만들어 둔 체험 그룹명
+            teacherPw: 'demo1234!',             // 교원 비밀번호
+            adminPw:   'demoadmin!'             // 관리자 비밀번호
+        };
+        const INSTALL_URL = 'https://여기에-설치안내-주소';   // 설치본 받는 곳
+
+        /* 체험장 전환 전부터 쓰고 계시던 그룹 — 정해진 날까지만 열어 둡니다.
+           만료 뒤에는 입력만 막고, 자료를 꺼낼 수 있도록 엑셀 내려받기는 남겨 둡니다.
+           그룹명의 빈칸은 밑줄(_)로 바꿔 적으세요. (예: '2026 도산초 80' → '2026_도산초_80') */
+        const LEGACY_GROUPS = {
+            '2026_도산초_80': '2027-02-28',
+            '2026골약초':     '2027-02-28'
+        };
+        /* ════════════════════════════════════════════════════════════ */
+
+        /** 기존 그룹인지, 남은 기간이 얼마인지 알려 준다 */
+        function legacyInfo(groupId) {
+            const until = LEGACY_GROUPS[groupId];
+            if (!until) return null;
+            const end = new Date(until + 'T23:59:59+09:00');
+            const now = new Date();
+            const days = Math.ceil((end - now) / 86400000);
+            return {
+                until: until,
+                end: end,
+                days: days,
+                expired: now > end,
+                soon: days <= 30 && days >= 0,
+                label: (function () {
+                    const t = until.split('-');
+                    return t[0] + '년 ' + Number(t[1]) + '월 ' + Number(t[2]) + '일';
+                })()
+            };
+        }
+
+        /** 만료된 그룹이면 안내하고 true 를 돌려준다 (입력 막기용) */
+        function blockedByExpiry() {
+            const L = legacyInfo(currentGroupId);
+            if (!L || !L.expired) return false;
+            alert('이 그룹의 사용 기간이 끝났습니다. (' + L.label + '까지)\n\n' +
+                  '새로 입력할 수는 없지만, [엑셀 다운로드]로 자료는 내려받으실 수 있습니다.\n' +
+                  '설치본을 받아 학교 계정에 옮겨 주세요.');
+            return true;
+        }
+
         const AUTH_DOMAIN = "@training-fee.local";
 
+        // 로그인에 쓰는 주소를 '그룹명'에서 만들어 낸다.
+        //  ※ 이 서비스는 이메일 주소를 수집하지 않는다.
+        //    Firebase 로그인에는 주소 형태가 필요하므로, 그룹명을 해시해 만든
+        //    가상의 주소를 쓴다. 실제로 메일이 오가는 주소가 아니다.
         async function groupEmails(groupId) {
             const buf = new TextEncoder().encode(groupId);
             const digest = await crypto.subtle.digest('SHA-256', buf);
             const hex = Array.from(new Uint8Array(digest)).slice(0, 12)
                             .map(b => b.toString(16).padStart(2, '0')).join('');
-            return { teacher: `t-${hex}${AUTH_DOMAIN}` };
+            return { admin: `a-${hex}${AUTH_DOMAIN}`, teacher: `t-${hex}${AUTH_DOMAIN}` };
         }
 
-        function isValidEmail(v) {
-            return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
+        // 비밀번호 규칙
+        //  ※ 메일로 재설정할 방법이 없으므로, 비밀번호가 유일한 열쇠다.
+        //    그룹명은 선생님들에게 알려 주는 값이라 사실상 공개된 아이디에 가깝다.
+        //    그래서 길이와 조합을 함께 본다.
+        function passwordProblem(pw) {
+            if (!pw || pw.length < 8) return '비밀번호는 8자 이상이어야 합니다.';
+            const kinds = [/[A-Za-z]/, /[0-9]/, /[^A-Za-z0-9]/].filter(re => re.test(pw)).length;
+            if (kinds < 2) return '영문·숫자·특수문자 중 두 가지 이상을 섞어 주세요.\n예) school2026!  /  yeonsu#78';
+            if (/^(.)\1+$/.test(pw)) return '같은 글자만 반복된 비밀번호는 사용할 수 없습니다.';
+            return '';
         }
 
         function authErrorMessage(e) {
             switch (e.code) {
-                case 'auth/user-not-found':      return '등록되지 않은 계정입니다. 이메일(또는 그룹명)을 확인해주세요.';
-                case 'auth/invalid-email':       return '이메일 형식이 올바르지 않습니다.';
+                case 'auth/user-not-found':      return '등록되지 않은 그룹입니다. 그룹명을 확인해주세요.';
+                case 'auth/invalid-email':       return '그룹명에 사용할 수 없는 문자가 있습니다.';
                 case 'auth/wrong-password':
                 case 'auth/invalid-credential':  return '비밀번호가 일치하지 않습니다.';
                 case 'auth/weak-password':       return '비밀번호는 6자 이상이어야 합니다.';
@@ -696,10 +859,11 @@
                     const created = data.createdAt ? data.createdAt.toDate() : new Date();
                     const item = {
                         id: doc.id, name: data.name, created: created, year: academicYearOf(created),
-                        adminEmail: data.adminEmail || '',
-                        teacherEmail: ''   // 그룹명에서 계산되므로 아래에서 채운다
+                        adminEmail: '', teacherEmail: ''   // 그룹명에서 계산되므로 아래에서 채운다
                     };
-                    pending.push(groupEmails(doc.id).then(e => { item.teacherEmail = e.teacher; }));
+                    pending.push(groupEmails(doc.id).then(e => {
+                        item.adminEmail = e.admin; item.teacherEmail = e.teacher;
+                    }));
                     (isExpiredGroup(created) ? expired : current).push(item);
                 });
                 await Promise.all(pending);
@@ -758,9 +922,8 @@
 
                 // 그룹을 지운 뒤 남는 계정 두 개를 함께 보여 준다
                 const acct = div.querySelector('[data-role="gacct"]');
-                acct.appendChild(accountRow('담당자', g.adminEmail,
-                    '개편 전에 만든 그룹이라 기록이 없습니다'));
-                acct.appendChild(accountRow('교원 접속', g.teacherEmail, ''));
+                acct.appendChild(accountRow('관리자 계정', g.adminEmail, ''));
+                acct.appendChild(accountRow('교원 계정', g.teacherEmail, ''));
 
                 div.querySelector('[data-role="gdel"]').onclick = () => superDeleteGroup(g.id, g.name);
                 listDiv.appendChild(div);
@@ -816,6 +979,42 @@
         function selectExpiredGroups(checked) {
             document.querySelectorAll('.group-check[data-expired="1"]').forEach(cb => { cb.checked = checked; });
             updateSelectedCount();
+        }
+
+        // 🔹 총괄 관리자: 체험 그룹 비우기
+        //    누구나 드나드는 곳이라 아무 내용이나 쌓인다.
+        //    명단은 그대로 두고 '지출 내역과 개인 비밀번호'만 지워 처음 상태로 되돌린다.
+        async function clearDemoGroup() {
+            const gid = DEMO.group.replace(/\s+/g, '_');
+            if (!confirm('체험 그룹을 처음 상태로 되돌립니다.\n\n' +
+                '· 대상: ' + DEMO.group + '\n' +
+                '· 지출 내역과 개인 비밀번호가 모두 지워집니다\n' +
+                '· 명단은 그대로 남습니다\n\n계속할까요?')) return;
+
+            const bar = document.getElementById('super-selected-count');
+            const before = bar.innerText;
+            bar.innerText = '비우는 중…';
+            try {
+                const membersSnap = await db.collection('groups').doc(gid).collection('members').get();
+                if (membersSnap.empty) { alert('체험 그룹을 찾을 수 없습니다.\n그룹명을 확인해 주세요: ' + DEMO.group); return; }
+
+                let wiped = 0;
+                for (const m of membersSnap.docs) {
+                    const exp = await m.ref.collection('expenses').get();
+                    if (!exp.empty) {
+                        const batch = db.batch();
+                        exp.forEach(d => batch.delete(d.ref));
+                        await batch.commit();
+                        wiped += exp.size;
+                    }
+                    await m.ref.update({ spentAmount: 0, isCompleted: false, isReturning: false, pin: null });
+                }
+                alert('체험 그룹을 비웠습니다.\n\n지운 지출 내역: ' + wiped + '건\n명단 ' + membersSnap.size + '칸은 그대로 있습니다.');
+            } catch (e) {
+                alert('비우기 실패: ' + (e && e.message ? e.message : e));
+            } finally {
+                bar.innerText = before;
+            }
         }
 
         // 🔹 총괄 관리자: 선택한 그룹 일괄 삭제
@@ -941,18 +1140,34 @@
         });
 
         async function createGroup() {
+            // 체험용 사이트에서는 새 그룹을 만들 수 없다 (화면과 코드 양쪽에서 막는다)
+            return alert('이 사이트는 체험용이라 새 그룹을 만들 수 없습니다.\n\n' +
+                '우리 학교에서 쓰시려면 설치본을 받아 학교 계정에 설치해 주세요.\n' +
+                '자료가 학교 밖으로 나가지 않습니다.');
+        }
+
+        async function createGroupDisabled() {
             const name = document.getElementById('admin-group-name').value.trim();
-            const email = document.getElementById('admin-email').value.trim().toLowerCase();
             const pw = document.getElementById('admin-password').value;
             const teacherPw = document.getElementById('teacher-password').value;
 
-            if(!name || !email || !pw || !teacherPw) return alert('모든 항목을 입력하세요.');
-            if(!isValidEmail(email)) return alert('관리자 이메일 형식이 올바르지 않습니다.');
-            if(pw.length < 6 || teacherPw.length < 6) return alert('비밀번호는 6자 이상이어야 합니다.');
+            if(!name || !pw || !teacherPw) return alert('모든 항목을 입력하세요.');
+            if(name.length > 50) return alert('그룹명은 50자 이내로 입력해주세요.');
+
+            const pwBad = passwordProblem(pw);
+            if (pwBad) return alert('[관리자 비밀번호]\n' + pwBad);
+            const tpwBad = passwordProblem(teacherPw);
+            if (tpwBad) return alert('[교원 안내용 비밀번호]\n' + tpwBad);
             if(pw === teacherPw) return alert('관리자 비밀번호와 교원 비밀번호는 서로 다르게 정해주세요.');
 
-            // 이메일 오타는 복구를 불가능하게 만들므로 한 번 더 확인받는다
-            if(!confirm('관리자 이메일이 정확한지 확인해주세요.\n\n' + email + '\n\n비밀번호를 잊었을 때 이 주소로만 재설정 메일을 받을 수 있습니다.')) return;
+            // 되찾을 방법이 없으므로, 만들기 전에 적어 두었는지 한 번 더 확인받는다
+            if(!confirm(
+                '적어 두셨나요?\n\n' +
+                '▷ 그룹명: ' + name + '\n' +
+                '▷ 관리자 비밀번호\n' +
+                '▷ 교원 안내용 비밀번호\n\n' +
+                '이 서비스는 이메일을 받지 않아 비밀번호를 대신 찾아 드릴 수 없습니다.\n' +
+                '잊으시면 이 그룹의 자료를 다시 열 수 없습니다.')) return;
 
             const groupId = name.replace(/\s+/g, '_');
             const groupRef = db.collection('groups').doc(groupId);
@@ -990,56 +1205,37 @@
                     }
                 }
 
-                // 2) 관리자 계정 (실제 이메일). 이미 있는 이메일이면 기존 계정으로 로그인한다.
+                // 2) 관리자 계정 (그룹명에서 만든 가상 주소). 남아 있으면 이어받는다.
                 let adminUid;
                 try {
-                    const cred = await firebase.auth().createUserWithEmailAndPassword(email, pw);
+                    const cred = await firebase.auth().createUserWithEmailAndPassword(emails.admin, pw);
                     adminUid = cred.user.uid;
                 } catch (e) {
-                    if (e.code === 'auth/email-already-in-use') {
-                        try {
-                            const cred = await firebase.auth().signInWithEmailAndPassword(email, pw);
-                            adminUid = cred.user.uid;
-                        } catch (e2) {
-                            // 계정은 남아 있는데 비밀번호가 맞지 않는 경우.
-                            // 이 계정은 여러 그룹을 담당하도록 만들어진 것이라 지울 필요가 없다.
-                            // 예전 비밀번호가 기억나지 않으면 그 자리에서 재설정 메일을 보내 준다.
-                            const wantReset = confirm(
-                                '이 이메일로 만든 계정이 이미 있습니다.\n\n' +
-                                '예전에 쓰시던 관리자 비밀번호를 입력하시면 이어서 만들 수 있습니다.\n' +
-                                '비밀번호가 기억나지 않으시면 [확인]을 눌러 재설정 메일을 받으세요.\n\n' + email);
-                            if (wantReset) {
-                                try {
-                                    await firebase.auth().sendPasswordResetEmail(email);
-                                    alert('재설정 메일을 보냈습니다.\n\n' + email + '\n\n' +
-                                          '메일에서 새 비밀번호를 정하신 뒤, 그 비밀번호로 다시 만들어 주세요.');
-                                } catch (e3) {
-                                    alert('메일 발송 실패: ' + authErrorMessage(e3));
-                                }
-                            }
-                            if (teacherCreated) await deleteTeacherAccount(emails.teacher, teacherPw);
-                            return;
-                        }
-                    } else {
+                    if (e.code !== 'auth/email-already-in-use') {
                         if (teacherCreated) await deleteTeacherAccount(emails.teacher, teacherPw);
                         throw e;
+                    }
+                    try {
+                        const cred = await firebase.auth().signInWithEmailAndPassword(emails.admin, pw);
+                        adminUid = cred.user.uid;
+                    } catch (e2) {
+                        if (teacherCreated) await deleteTeacherAccount(emails.teacher, teacherPw);
+                        return alert('같은 이름의 그룹이 예전에 있었습니다.\n\n' +
+                            '그때 쓰시던 관리자 비밀번호를 입력하시면 이어서 만들 수 있습니다.\n' +
+                            '기억나지 않으시면 그룹명을 조금 바꿔 주세요.\n\n' +
+                            '예) 2026 운남초 → 2026 운남초 2학기');
                     }
                 }
 
                 await groupRef.set({
                     name: name,
                     adminUid: adminUid,
-                    // 총괄 화면에서 '누가 만든 그룹인지' 확인하고, 그룹을 지운 뒤
-                    // 남는 계정을 찾아 정리할 수 있도록 담당자 주소를 함께 남긴다.
-                    adminEmail: email,
                     teacherUid: teacherUid,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                // 관리자가 어떤 그룹을 관리하는지 기록 (로그인 후 그룹을 찾는 용도)
-                await db.collection('adminIndex').doc(adminUid).set({
-                    groupIds: firebase.firestore.FieldValue.arrayUnion(groupId)
-                }, { merge: true });
+                // ※ 담당자 주소를 따로 기록하지 않는다. 이 서비스는 이메일을 수집하지 않는다.
+                //   관리자는 '그룹명 + 관리자 비밀번호'로 로그인하므로 별도의 색인도 필요 없다.
 
                 const defaultRoster = ["교장", "교감", "1학년 1반", "1학년 2반", "1학년 3반", "2학년 1반", "2학년 2반", "2학년 3반", "3학년 1반", "3학년 2반", "3학년 3반", "4학년 1반", "4학년 2반", "4학년 3반", "5학년 1반", "5학년 2반", "5학년 3반", "6학년 1반", "6학년 2반", "6학년 3반", "교담 1", "교담 2", "교담 3", "특수", "보건", "영양", "상담"];
 
@@ -1079,9 +1275,41 @@
             showScreen('screen-admin-dashboard');
         }
 
+        /** 기존 그룹 사용 기한 안내를 그린다 (교원·관리자 화면 공용) */
+        function legacyBannerHTML(L) {
+            if (L.expired) {
+                return '<div class="lg-warn lg-over">' +
+                    '<b>⛔ 사용 기간이 끝났습니다 (' + L.label + '까지)</b>' +
+                    '<p>새로 입력할 수는 없지만 <b>엑셀 내려받기는 그대로</b> 됩니다. ' +
+                    '자료를 보관하신 뒤 설치본으로 옮겨 주세요.</p>' +
+                    '<a href="' + INSTALL_URL + '" target="_blank" rel="noopener" class="lg-btn">📦 설치본 받기</a></div>';
+            }
+            if (L.soon) {
+                return '<div class="lg-warn lg-soon">' +
+                    '<b>⚠️ ' + L.label + '까지 사용할 수 있습니다 (D-' + L.days + ')</b>' +
+                    '<p>기간이 끝나면 새 입력이 막힙니다. <b>지금 설치본으로 옮겨</b> 주세요.</p>' +
+                    '<a href="' + INSTALL_URL + '" target="_blank" rel="noopener" class="lg-btn">📦 설치본 받기</a></div>';
+            }
+            return '<div class="lg-warn lg-ok">' +
+                '<b>📅 ' + L.label + '까지 사용할 수 있습니다 (D-' + L.days + ')</b>' +
+                '<p>이 사이트는 체험용으로 바뀌었습니다. 기간 안에 <b>설치본</b>을 받아 학교 계정으로 옮겨 주세요.</p>' +
+                '<a href="' + INSTALL_URL + '" target="_blank" rel="noopener" class="lg-btn">📦 설치본 받기</a></div>';
+        }
+
         // 학년도 종료 후 삭제된다는 안내
         function showRetentionNotice(createdAt) {
             const box = document.getElementById('retention-notice');
+
+            // 기존 그룹이면 사용 기한 안내를 우선 보여 준다
+            const L = legacyInfo(currentGroupId);
+            if (L) {
+                box.innerHTML = legacyBannerHTML(L);
+                box.className = 'mb-4';
+                box.classList.remove('hidden');
+                return;
+            }
+
+            box.className = 'hidden bg-amber-50 border border-amber-200 text-amber-900 rounded-lg p-3 text-sm mb-4';
             if (!createdAt) { box.classList.add('hidden'); return; }
 
             const year = academicYearOf(createdAt);
@@ -1183,74 +1411,35 @@
         setupPasswordEyes();
 
         async function loginAdmin() {
-            const email = document.getElementById('login-admin-email').value.trim().toLowerCase();
+            const name = document.getElementById('login-group-name').value.trim();
             const pw = document.getElementById('login-admin-pw').value;
-            if(!email || !pw) return alert('이메일과 비밀번호를 입력하세요.');
+            if(!name || !pw) return alert('그룹명과 비밀번호를 입력하세요.');
 
+            const groupId = name.replace(/\s+/g, '_');
+            const emails = await groupEmails(groupId);
             try {
                 // 서버에서 비밀번호를 검증한다 (실패하면 데이터에 접근할 수 없다)
-                const cred = await firebase.auth().signInWithEmailAndPassword(email, pw);
-                await openAdminGroups(cred.user.uid);
-            } catch (e) { alert(authErrorMessage(e)); }
-        }
-
-        // 이 관리자가 맡은 그룹을 찾아 들어간다 (여러 개면 선택 화면)
-        async function openAdminGroups(uid) {
-            const idx = await db.collection('adminIndex').doc(uid).get();
-            const ids = (idx.exists && idx.data().groupIds) ? idx.data().groupIds : [];
-
-            const groups = [];
-            for (const id of ids) {
-                try {
-                    const doc = await db.collection('groups').doc(id).get();
-                    if (doc.exists) groups.push({
-                        id: id,
-                        name: doc.data().name,
-                        created: doc.data().createdAt ? doc.data().createdAt.toDate() : null
-                    });
-                } catch (_) {}
-            }
-
-            if (groups.length === 0) {
-                alert('이 계정으로 관리하는 그룹이 없습니다.');
-                await logout();
-                return;
-            }
-            if (groups.length === 1) {
-                enterAdminGroup(groups[0].id, groups[0].name, groups[0].created);
-                return;
-            }
-
-            const listDiv = document.getElementById('group-select-list');
-            listDiv.innerHTML = '';
-            groups.forEach(g => {
-                const btn = document.createElement('button');
-                btn.className = 'card w-full p-4 text-left font-bold text-gray-800 hover:bg-blue-50 transition-all';
-                btn.innerText = g.name;
-                btn.onclick = () => enterAdminGroup(g.id, g.name, g.created);
-                listDiv.appendChild(btn);
-            });
-            showScreen('screen-group-select');
-        }
-
-        // 비밀번호 재설정 메일 발송
-        async function sendResetMail() {
-            const preset = document.getElementById('login-admin-email').value.trim();
-            const email = (prompt('가입할 때 등록한 관리자 이메일을 입력하세요:', preset) || '').trim().toLowerCase();
-            if (!email) return;
-            if (!isValidEmail(email)) return alert('이메일 형식이 올바르지 않습니다.');
-
-            try {
-                await firebase.auth().sendPasswordResetEmail(email);
-                alert('재설정 메일을 보냈습니다.\n\n메일함(스팸함 포함)을 확인해 새 비밀번호를 설정한 뒤 다시 로그인해주세요.');
+                await firebase.auth().signInWithEmailAndPassword(emails.admin, pw);
+                const doc = await db.collection('groups').doc(groupId).get();
+                if (!doc.exists) {
+                    await logout();
+                    return alert('그룹을 찾을 수 없습니다.\n그룹명을 다시 확인해 주세요.');
+                }
+                enterAdminGroup(groupId, doc.data().name,
+                    doc.data().createdAt ? doc.data().createdAt.toDate() : null);
             } catch (e) {
-                alert('발송 실패: ' + authErrorMessage(e));
+                if (e && (e.code === 'auth/user-not-found' || e.code === 'auth/invalid-credential'
+                          || e.code === 'auth/wrong-password')) {
+                    return alert('그룹명 또는 비밀번호가 맞지 않습니다.');
+                }
+                alert(authErrorMessage(e));
             }
         }
 
         async function changeAdminPassword() {
-            const newPw = prompt('새로운 관리자 비밀번호를 입력하세요 (6자 이상):');
-            if (!newPw || newPw.trim().length < 6) return alert('비밀번호는 6자 이상이어야 합니다.');
+            const newPw = prompt('새로운 관리자 비밀번호를 입력하세요\n(8자 이상, 영문·숫자·특수문자 중 2가지 이상):');
+            if (!newPw) return;
+            { const bad = passwordProblem(newPw.trim()); if (bad) return alert(bad); }
             const confirmPw = prompt('비밀번호 확인을 위해 한 번 더 입력하세요:');
             if (newPw !== confirmPw) return alert('비밀번호가 일치하지 않습니다. 다시 시도해주세요.');
 
@@ -1264,8 +1453,9 @@
         async function changeTeacherPassword() {
             const curPw = prompt('현재 교원 비밀번호를 입력하세요:');
             if (!curPw) return;
-            const newPw = prompt('새로운 교원 비밀번호를 입력하세요 (6자 이상):');
-            if (!newPw || newPw.trim().length < 6) return alert('비밀번호는 6자 이상이어야 합니다.');
+            const newPw = prompt('새로운 교원 비밀번호를 입력하세요\n(8자 이상, 영문·숫자·특수문자 중 2가지 이상):');
+            if (!newPw) return;
+            { const bad = passwordProblem(newPw.trim()); if (bad) return alert(bad); }
             const adminPw = prompt('본인 확인을 위해 관리자 비밀번호를 입력하세요:');
             if (!adminPw) return;
 
@@ -1284,13 +1474,14 @@
         }
 
         async function addMember() {
+            if (blockedByExpiry()) return;
             const role = document.getElementById('new-member-role').value.trim();
-            const name = document.getElementById('new-member-name').value.trim();
             if(!role) return alert('구분을 입력하세요.');
+            if(role.length > 30) return alert('구분은 30자 이내로 입력해주세요.');
             try {
-                await db.collection('groups').doc(currentGroupId).collection('members').add({ role: role, name: name, spentAmount: 0, isCompleted: false, pin: null, isReturning: false });
+                // 이름은 수집하지 않는다 (빈 값으로 둔다)
+                await db.collection('groups').doc(currentGroupId).collection('members').add({ role: role, name: '', spentAmount: 0, isCompleted: false, pin: null, isReturning: false });
                 document.getElementById('new-member-role').value = '';
-                document.getElementById('new-member-name').value = '';
             } catch (e) { alert('추가 실패'); }
         }
 
@@ -1298,9 +1489,8 @@
             const newRole = prompt(`현재 구분: [${oldRole}]\n변경할 구분을 입력하세요:`, oldRole);
             if(!newRole || newRole.trim() === '') return;
             if(newRole.trim().length > 30) return alert('구분은 30자 이내로 입력해주세요.');
-            const newName = prompt(`현재 이름: [${oldName || ''}]\n변경할 이름을 입력하세요 (없으면 비워두기):`, oldName || '');
-            if((newName || '').trim().length > 30) return alert('이름은 30자 이내로 입력해주세요.');
-            try { await db.collection('groups').doc(currentGroupId).collection('members').doc(memberId).update({ role: newRole.trim(), name: (newName || '').trim() }); } catch (e) { alert('수정 실패'); }
+            // 이름은 더 이상 받지 않는다. 예전에 입력된 이름이 있으면 이 기회에 지운다.
+            try { await db.collection('groups').doc(currentGroupId).collection('members').doc(memberId).update({ role: newRole.trim(), name: '' }); } catch (e) { alert('수정 실패'); }
         }
 
         async function deleteMember(memberId, role) {
@@ -1417,6 +1607,12 @@
         }
 
         function loadMembers() {
+            // 기존 그룹이면 사용 기한을 먼저 알린다
+            const nb = document.getElementById('user-legacy-notice');
+            const L = legacyInfo(currentGroupId);
+            if (L) { nb.innerHTML = legacyBannerHTML(L); nb.classList.remove('hidden'); }
+            else { nb.innerHTML = ''; nb.classList.add('hidden'); }
+
             const listDiv = document.getElementById('member-list');
             listDiv.innerHTML = '<div class="col-span-full text-center py-10 text-gray-400">로딩 중...</div>';
 
@@ -1468,6 +1664,7 @@
         }
 
         async function toggleReturn() {
+            if (blockedByExpiry()) return;
             try {
                 const memberRef = db.collection('groups').doc(currentGroupId).collection('members').doc(currentMemberId);
                 const doc = await memberRef.get();
@@ -1478,6 +1675,7 @@
         }
 
         async function addExpense() {
+            if (blockedByExpiry()) return;
             const category = document.getElementById('expense-category').value;
             const item = document.getElementById('expense-item').value.trim();
             const amount = parseInt(document.getElementById('expense-amount').value);
@@ -1776,6 +1974,33 @@
         });
 
         // 첫 진입 기록 (뒤로가기로 홈까지 되돌아올 수 있도록)
+        // 체험 계정과 설치본 링크를 화면에 채운다
+        (function () {
+            document.getElementById('demo-group').textContent = DEMO.group;
+            document.getElementById('demo-tpw').textContent = DEMO.teacherPw;
+            document.getElementById('demo-apw').textContent = DEMO.adminPw;
+            ['install-link', 'install-link-2'].forEach(function (id) {
+                const a = document.getElementById(id);
+                if (a) a.href = INSTALL_URL;
+            });
+            // ※ 그룹명을 미리 채워 두지 않는다.
+            //   기존에 쓰고 계신 학교가 자기 그룹명을 넣는 데 방해가 되기 때문이다.
+            //   체험은 아래 버튼으로 한 번에 들어가도록 한다.
+        })();
+
+        // 체험 계정으로 바로 들어가기
+        function enterDemo(role) {
+            if (role === 'admin') {
+                document.getElementById('login-group-name').value = DEMO.group;
+                document.getElementById('login-admin-pw').value = DEMO.adminPw;
+                showScreen('screen-admin-login');
+            } else {
+                document.getElementById('user-group-name').value = DEMO.group;
+                document.getElementById('user-group-pw').value = DEMO.teacherPw;
+                showScreen('screen-user-start');
+            }
+        }
+
         history.replaceState({ screen: 'screen-home' }, '');
 
     </script>
