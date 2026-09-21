@@ -132,6 +132,15 @@
         .trust-row { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
         .trust-chip { display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700; color: #475569; background: #fff; border: 1.5px solid #e2e8f0; padding: 6px 12px; border-radius: 99px; }
 
+        /* 총괄 화면 - 그룹별 계정 표시 */
+        .acct-box { margin-top: 8px; display: flex; flex-direction: column; gap: 4px; }
+        .acct-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+        .acct-tag { font-size: 10px; font-weight: 800; color: #7c3aed; background: #f5f3ff; border: 1px solid #ddd6fe; padding: 1px 6px; border-radius: 4px; flex-shrink: 0; }
+        .acct-mail { font-size: 12px; color: #475569; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; word-break: break-all; }
+        .acct-none { font-size: 12px; color: #cbd5e1; }
+        .acct-copy { font-size: 10px; font-weight: 700; color: #64748b; background: #f8fafc; border: 1px solid #e2e8f0; padding: 1px 7px; border-radius: 4px; cursor: pointer; flex-shrink: 0; }
+        .acct-copy:hover { background: #eef2f7; color: #334155; }
+
         /* 개인정보 처리 안내 */
         .privacy-box { background: #fff; border-radius: 16px; border: 2px solid #e2e8f0; overflow: hidden; }
         .privacy-box > summary { list-style: none; cursor: pointer; padding: 16px 20px; display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 800; color: #334155; }
@@ -251,6 +260,7 @@
                             정산 현황을 함께 확인하는 도구이므로, <b>같은 그룹에 접속한 선생님들은 서로의 이름·담당·집행 현황과 지출 항목을 볼 수 있습니다.</b>
                             이름 옆의 개인 비밀번호는 <b>다른 분이 실수로 남의 칸에 입력하는 것을 막기 위한 장치이며, 서로의 내역을 가려주지는 않습니다.</b>
                             따라서 다른 곳에서 쓰는 비밀번호를 그대로 사용하지 마시고, 지출 항목명에는 알려지길 원치 않는 내용을 적지 말아 주세요.
+                            같은 그룹에서는 담당자의 이메일 주소도 확인할 수 있습니다.
                             다른 학교(그룹)의 자료는 서로 볼 수 없습니다.
                         </dd>
 
@@ -469,6 +479,12 @@
                 이곳은 개발자/시스템 총괄 관리자 전용 화면입니다.<br>
                 생성된 모든 학교(그룹) 목록을 확인하거나 <b>그룹을 통째로 강제 삭제</b>할 수 있습니다.<br>
                 <span class="text-xs">※ 허용된 구글 계정으로만 들어올 수 있습니다. 그룹 접속 비밀번호는 암호화되어 저장되므로 이곳에서도 확인할 수 없지만, 교원 개인의 '본인 확인용 비밀번호'는 평문으로 저장되니 취급에 유의하세요.</span>
+                <div class="mt-3 pt-3 border-t border-purple-200 text-xs leading-relaxed">
+                    <b>🔑 그룹을 삭제한 뒤에는</b> 아래 표시된 계정 두 개가 로그인 정보에 그대로 남습니다.
+                    같은 그룹명·같은 이메일로 다시 만들려면
+                    <a href="https://console.firebase.google.com/project/training-fee-manager/authentication/users" target="_blank" rel="noopener" class="underline font-bold">Firebase 콘솔 → Authentication → Users</a>에서
+                    해당 계정을 찾아 직접 삭제해 주세요. <b>삭제하기 전에 주소를 복사해 두시면 편합니다.</b>
+                </div>
             </div>
             <div id="super-bulk-bar" class="hidden sticky top-0 z-10 bg-white border border-purple-200 rounded-lg p-3 mb-3 flex flex-wrap items-center gap-2 shadow-sm">
                 <label class="flex items-center gap-2 text-sm font-bold text-gray-700 cursor-pointer">
@@ -675,12 +691,19 @@
                 if(snapshot.empty) return listDiv.innerHTML = '<div class="text-center py-10 text-gray-500">생성된 그룹이 없습니다.</div>';
 
                 const expired = [], current = [];
+                const pending = [];
                 snapshot.forEach(doc => {
                     const data = doc.data();
                     const created = data.createdAt ? data.createdAt.toDate() : new Date();
-                    const item = { id: doc.id, name: data.name, created: created, year: academicYearOf(created) };
+                    const item = {
+                        id: doc.id, name: data.name, created: created, year: academicYearOf(created),
+                        adminEmail: data.adminEmail || '',
+                        teacherEmail: ''   // 그룹명에서 계산되므로 아래에서 채운다
+                    };
+                    pending.push(groupEmails(doc.id).then(e => { item.teacherEmail = e.teacher; }));
                     (isExpiredGroup(created) ? expired : current).push(item);
                 });
+                await Promise.all(pending);
                 const byYear = (a, b) => (a.year - b.year) || a.name.localeCompare(b.name, 'ko');
                 expired.sort(byYear);
                 current.sort(byYear);
@@ -719,10 +742,11 @@
                 // ※ 그룹명은 외부에서 들어온 값이므로 절대 innerHTML로 넣지 않는다.
                 //   (조작된 그룹명이 총괄 관리자 권한으로 실행되는 것을 막는다)
                 div.innerHTML = `
-                    <input type="checkbox" class="group-check w-4 h-4 shrink-0" data-expired="${isExpired ? '1' : '0'}">
+                    <input type="checkbox" class="group-check w-4 h-4 shrink-0 mt-1" data-expired="${isExpired ? '1' : '0'}">
                     <div class="flex flex-col flex-1 min-w-0">
                         <span class="font-bold text-lg text-gray-800 truncate" data-role="gname"></span>
                         <span class="text-xs text-gray-500 mt-1" data-role="gmeta"></span>
+                        <div class="acct-box" data-role="gacct"></div>
                     </div>
                     <button class="bg-red-50 text-red-600 border border-red-200 px-3 py-2 rounded text-sm font-bold hover:bg-red-100 transition-colors shrink-0" data-role="gdel">삭제</button>
                 `;
@@ -732,10 +756,56 @@
                 div.querySelector('[data-role="gname"]').textContent = g.name;
                 div.querySelector('[data-role="gmeta"]').textContent =
                     `${g.year}학년도 · 생성일 ${g.created.toLocaleDateString('ko-KR')}`;
+
+                // 그룹을 지운 뒤 남는 계정 두 개를 함께 보여 준다
+                const acct = div.querySelector('[data-role="gacct"]');
+                acct.appendChild(accountRow('담당자', g.adminEmail,
+                    '개편 전에 만든 그룹이라 기록이 없습니다'));
+                acct.appendChild(accountRow('교원 접속', g.teacherEmail, ''));
+
                 div.querySelector('[data-role="gdel"]').onclick = () => superDeleteGroup(g.id, g.name);
                 listDiv.appendChild(div);
                 chk.addEventListener('change', updateSelectedCount);
             });
+        }
+
+        // 총괄 화면에서 계정 주소 한 줄을 그린다 (주소는 반드시 textContent로 넣는다)
+        function accountRow(label, email, emptyMsg) {
+            const row = document.createElement('div');
+            row.className = 'acct-row';
+
+            const tag = document.createElement('span');
+            tag.className = 'acct-tag';
+            tag.textContent = label;
+            row.appendChild(tag);
+
+            const val = document.createElement('span');
+            if (email) {
+                val.className = 'acct-mail';
+                val.textContent = email;
+            } else {
+                val.className = 'acct-none';
+                val.textContent = emptyMsg;
+            }
+            row.appendChild(val);
+
+            if (email) {
+                const btn = document.createElement('button');
+                btn.className = 'acct-copy';
+                btn.textContent = '복사';
+                btn.onclick = async (e) => {
+                    e.stopPropagation();
+                    try {
+                        await navigator.clipboard.writeText(email);
+                        btn.textContent = '복사됨';
+                    } catch (_) {
+                        btn.textContent = '복사 실패';
+                    }
+                    setTimeout(() => { btn.textContent = '복사'; }, 1200);
+                };
+                row.appendChild(btn);
+            }
+            return row;
         }
 
         function updateSelectedCount() {
@@ -890,14 +960,35 @@
             const emails = await groupEmails(groupId);
 
             try {
-                // 1) 교원용 계정 생성 (동시에 그룹명 중복 검사 역할)
+                // 1) 교원용 계정 생성
+                //    ※ 그룹을 삭제해도 접속 계정은 남는다(계정은 다른 저장소에 있고 브라우저에서 지울 수 없다).
+                //      그래서 같은 이름을 다시 쓸 때는, 남아 있는 계정을 되살려 쓸 수 있는지 먼저 확인한다.
                 let teacherUid;
+                let teacherCreated = false;      // 이번에 새로 만든 계정인지
                 try {
                     const cred = await firebase.auth().createUserWithEmailAndPassword(emails.teacher, teacherPw);
                     teacherUid = cred.user.uid;
+                    teacherCreated = true;
                 } catch (e) {
-                    if (e.code === 'auth/email-already-in-use') return alert('이미 존재하는 그룹명입니다.');
-                    throw e;
+                    if (e.code !== 'auth/email-already-in-use') throw e;
+
+                    // 예전에 같은 이름의 그룹이 있었다. 입력한 비밀번호로 그 계정을 이어받을 수 있는지 확인한다.
+                    try {
+                        const cred = await firebase.auth().signInWithEmailAndPassword(emails.teacher, teacherPw);
+                        teacherUid = cred.user.uid;
+                    } catch (e2) {
+                        return alert('같은 이름의 그룹이 예전에 있었습니다.\n\n' +
+                            '그때 쓰시던 교원 비밀번호를 입력하시면 이어서 만들 수 있습니다.\n' +
+                            '기억나지 않으시면 그룹명을 조금 바꿔 주세요.\n\n' +
+                            '예) 2026 운남초 → 2026 운남초 2학기');
+                    }
+
+                    // 아직 쓰고 있는 그룹이면 덮어쓰지 않는다
+                    const existing = await groupRef.get().catch(() => null);
+                    if (existing && existing.exists) {
+                        await firebase.auth().signOut();
+                        return alert('이미 사용 중인 그룹명입니다.\n다른 그룹명을 정해 주세요.');
+                    }
                 }
 
                 // 2) 관리자 계정 (실제 이메일). 이미 있는 이메일이면 기존 계정으로 로그인한다.
@@ -911,12 +1002,27 @@
                             const cred = await firebase.auth().signInWithEmailAndPassword(email, pw);
                             adminUid = cred.user.uid;
                         } catch (e2) {
-                            alert('이 이메일로 이미 만든 그룹이 있습니다.\n같은 이메일로 새 그룹을 만들려면 기존 관리자 비밀번호를 그대로 입력하세요.');
-                            await deleteTeacherAccount(emails.teacher, teacherPw);
+                            // 계정은 남아 있는데 비밀번호가 맞지 않는 경우.
+                            // 이 계정은 여러 그룹을 담당하도록 만들어진 것이라 지울 필요가 없다.
+                            // 예전 비밀번호가 기억나지 않으면 그 자리에서 재설정 메일을 보내 준다.
+                            const wantReset = confirm(
+                                '이 이메일로 만든 계정이 이미 있습니다.\n\n' +
+                                '예전에 쓰시던 관리자 비밀번호를 입력하시면 이어서 만들 수 있습니다.\n' +
+                                '비밀번호가 기억나지 않으시면 [확인]을 눌러 재설정 메일을 받으세요.\n\n' + email);
+                            if (wantReset) {
+                                try {
+                                    await firebase.auth().sendPasswordResetEmail(email);
+                                    alert('재설정 메일을 보냈습니다.\n\n' + email + '\n\n' +
+                                          '메일에서 새 비밀번호를 정하신 뒤, 그 비밀번호로 다시 만들어 주세요.');
+                                } catch (e3) {
+                                    alert('메일 발송 실패: ' + authErrorMessage(e3));
+                                }
+                            }
+                            if (teacherCreated) await deleteTeacherAccount(emails.teacher, teacherPw);
                             return;
                         }
                     } else {
-                        await deleteTeacherAccount(emails.teacher, teacherPw);
+                        if (teacherCreated) await deleteTeacherAccount(emails.teacher, teacherPw);
                         throw e;
                     }
                 }
@@ -924,6 +1030,9 @@
                 await groupRef.set({
                     name: name,
                     adminUid: adminUid,
+                    // 총괄 화면에서 '누가 만든 그룹인지' 확인하고, 그룹을 지운 뒤
+                    // 남는 계정을 찾아 정리할 수 있도록 담당자 주소를 함께 남긴다.
+                    adminEmail: email,
                     teacherUid: teacherUid,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
@@ -944,7 +1053,12 @@
 
                 enterAdminGroup(groupId, name, new Date());
                 openCreatedModal(name, teacherPw);
-            } catch (e) { alert(authErrorMessage(e)); }
+            } catch (e) {
+                if (e && e.code === 'permission-denied') {
+                    return alert('이미 사용 중인 그룹명입니다.\n다른 그룹명을 정해 주세요.');
+                }
+                alert(authErrorMessage(e));
+            }
         }
 
         // 그룹 생성이 중단됐을 때 방금 만든 교원 계정을 되돌린다
