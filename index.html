@@ -645,7 +645,18 @@
             teacherPw: 'demo1234!',             // 교원 비밀번호
             adminPw:   'demoadmin!'             // 관리자 비밀번호
         };
-        const INSTALL_URL = 'https://여기에-설치안내-주소';   // 설치본 받는 곳
+        const INSTALL_URL = 'https://drive.google.com/drive/folders/1mNRKGgGYKsgzmfXvXDaUc8ICxxjrzyiF?usp=sharing';   // 설치본 받는 곳
+
+        /** 설치본 주소를 실제로 적어 두셨는지 확인한다 */
+        function installUrlReady() {
+            return /^https?:\/\//.test(INSTALL_URL) && INSTALL_URL.indexOf('여기에') < 0;
+        }
+        function installNotReady() {
+            alert('설치본을 받는 주소가 아직 연결되지 않았습니다.\n\n' +
+                'index.html 맨 위의 INSTALL_URL 에\n' +
+                '설치본(setup.html·설치안내서)을 올려 두신 주소를 적어 주세요.\n\n' +
+                '구글 드라이브 공유 폴더 주소면 충분합니다.');
+        }
 
         /* 체험장 전환 전부터 쓰고 계시던 그룹 — 정해진 날까지만 열어 둡니다.
            만료 뒤에는 입력만 막고, 자료를 꺼낼 수 있도록 엑셀 내려받기는 남겨 둡니다.
@@ -1302,24 +1313,32 @@
         }
 
         /** 기존 그룹 사용 기한 안내를 그린다 (교원·관리자 화면 공용) */
+        /** 설치본 버튼 — 주소가 없으면 눌렀을 때 안내가 뜨게 한다 */
+        function installBtnHTML(cls) {
+            if (installUrlReady()) {
+                return '<a href="' + INSTALL_URL + '" target="_blank" rel="noopener" class="' + cls + '">📦 설치본 받기</a>';
+            }
+            return '<a href="#" class="' + cls + '" onclick="event.preventDefault();installNotReady();">📦 설치본 받기</a>';
+        }
+
         function legacyBannerHTML(L) {
             if (L.expired) {
                 return '<div class="lg-warn lg-over">' +
                     '<b>⛔ 사용 기간이 끝났습니다 (' + L.label + '까지)</b>' +
                     '<p>새로 입력할 수는 없지만 <b>엑셀 내려받기는 그대로</b> 됩니다. ' +
                     '자료를 보관하신 뒤 설치본으로 옮겨 주세요.</p>' +
-                    '<a href="' + INSTALL_URL + '" target="_blank" rel="noopener" class="lg-btn">📦 설치본 받기</a></div>';
+                    installBtnHTML('lg-btn') + '</div>';
             }
             if (L.soon) {
                 return '<div class="lg-warn lg-soon">' +
                     '<b>⚠️ ' + L.label + '까지 사용할 수 있습니다 (D-' + L.days + ')</b>' +
                     '<p>기간이 끝나면 새 입력이 막힙니다. <b>지금 설치본으로 옮겨</b> 주세요.</p>' +
-                    '<a href="' + INSTALL_URL + '" target="_blank" rel="noopener" class="lg-btn">📦 설치본 받기</a></div>';
+                    installBtnHTML('lg-btn') + '</div>';
             }
             return '<div class="lg-warn lg-ok">' +
                 '<b>📅 ' + L.label + '까지 사용할 수 있습니다 (D-' + L.days + ')</b>' +
                 '<p>이 사이트는 체험용으로 바뀌었습니다. 기간 안에 <b>설치본</b>을 받아 학교 계정으로 옮겨 주세요.</p>' +
-                '<a href="' + INSTALL_URL + '" target="_blank" rel="noopener" class="lg-btn">📦 설치본 받기</a></div>';
+                installBtnHTML('lg-btn') + '</div>';
         }
 
         // 학년도 종료 후 삭제된다는 안내
@@ -2006,9 +2025,14 @@
             document.getElementById('demo-group').textContent = DEMO.group;
             document.getElementById('demo-tpw').textContent = DEMO.teacherPw;
             document.getElementById('demo-apw').textContent = DEMO.adminPw;
+            // 설치본 주소가 아직 설정되지 않았으면, 빈 페이지로 보내지 말고 안내한다
             ['install-link', 'install-link-2'].forEach(function (id) {
                 const a = document.getElementById(id);
-                if (a) a.href = INSTALL_URL;
+                if (!a) return;
+                if (installUrlReady()) { a.href = INSTALL_URL; return; }
+                a.href = '#';
+                a.removeAttribute('target');
+                a.onclick = function (e) { e.preventDefault(); installNotReady(); };
             });
             // ※ 그룹명을 미리 채워 두지 않는다.
             //   기존에 쓰고 계신 학교가 자기 그룹명을 넣는 데 방해가 되기 때문이다.
