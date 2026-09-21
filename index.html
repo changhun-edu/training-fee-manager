@@ -165,7 +165,7 @@
         .dbt-e { font-size: 26px; line-height: 1; }
         .dbt-t { font-size: 14px; font-weight: 800; line-height: 1.35; }
 
-        /* 이미 쓰고 계신 학교용 — 체험보다 시각적 무게를 낮춘다 */
+        /* 직접 입력해 들어가는 길 — 체험보다 시각적 무게를 낮춘다 */
         .already { background: #fff; border: 1px solid var(--line, #e2e8f0); border-radius: 12px;
                    padding: 14px 16px; text-align: center; }
         .al-t { font-size: 12px; font-weight: 700; color: #94a3b8; margin-bottom: 10px; }
@@ -289,14 +289,13 @@
                 <a id="install-link" href="#" target="_blank" rel="noopener" class="db-btn">📦 우리 학교에 설치하기</a>
             </div>
 
-            <!-- 이미 쓰고 계신 학교용 (체험이 주가 되도록 무게를 낮춘다) -->
+            <!-- 직접 입력해 들어가는 길 (체험이 주가 되도록 무게를 낮춘다) -->
             <div class="already">
-                <div class="al-t">이미 이 사이트를 쓰고 계신 학교라면</div>
+                <div class="al-t">그룹명과 비밀번호를 직접 입력해 들어가기</div>
                 <div class="al-row">
                     <button onclick="showScreen('screen-user-start')" class="al-btn">👤 교원으로 접속</button>
                     <button onclick="showScreen('screen-admin-menu')" class="al-btn">👑 담당자 로그인</button>
                 </div>
-                <div class="al-n">그룹명과 비밀번호를 직접 입력해 들어갑니다</div>
             </div>
 
             <!-- 사용 순서 -->
@@ -2063,7 +2062,7 @@
                 a.onclick = function (e) { e.preventDefault(); installNotReady(); };
             });
             // ※ 그룹명을 미리 채워 두지 않는다.
-            //   기존에 쓰고 계신 학교가 자기 그룹명을 넣는 데 방해가 되기 때문이다.
+            //   자기 그룹명을 넣으려는 분에게 방해가 되기 때문이다.
             //   체험은 아래 버튼으로 한 번에 들어가도록 한다.
         })();
 
