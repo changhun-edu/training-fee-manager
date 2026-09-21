@@ -153,10 +153,27 @@
         .dbk-r { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 3px 0; }
         .dbk-r span { font-size: 12px; color: #a16207; }
         .dbk-r b { font-size: 13px; color: #78350f; font-family: ui-monospace, Menlo, monospace; word-break: break-all; }
-        .db-try { display: flex; gap: 8px; margin-bottom: 14px; }
-        .dbt-btn { flex: 1; background: #fff; border: 1.5px solid #fcd34d; color: #92400e;
-                   font-size: 13px; font-weight: 700; padding: 10px 6px; border-radius: 9px; }
-        .dbt-btn:hover { background: #fffbeb; }
+        .db-hint { font-size: 12px; font-weight: 700; color: #92400e; text-align: center;
+                   margin-bottom: 9px; word-break: keep-all; }
+        .db-try { display: flex; gap: 10px; margin-bottom: 16px; }
+        .dbt-btn { flex: 1; background: #f59e0b; border: none; color: #fff;
+                   padding: 16px 8px; border-radius: 12px; cursor: pointer;
+                   display: flex; flex-direction: column; align-items: center; gap: 6px;
+                   box-shadow: 0 3px 0 #b45309; transition: all .12s; }
+        .dbt-btn:hover { background: #d97706; }
+        .dbt-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #b45309; }
+        .dbt-e { font-size: 26px; line-height: 1; }
+        .dbt-t { font-size: 14px; font-weight: 800; line-height: 1.35; }
+
+        /* 이미 쓰고 계신 학교용 — 체험보다 시각적 무게를 낮춘다 */
+        .already { background: #fff; border: 1px solid var(--line, #e2e8f0); border-radius: 12px;
+                   padding: 14px 16px; text-align: center; }
+        .al-t { font-size: 12px; font-weight: 700; color: #94a3b8; margin-bottom: 10px; }
+        .al-row { display: flex; gap: 8px; }
+        .al-btn { flex: 1; background: #f8fafc; border: 1px solid #cbd5e1; color: #475569;
+                  font-size: 13px; font-weight: 700; padding: 10px 6px; border-radius: 8px; cursor: pointer; }
+        .al-btn:hover { background: #eef2f7; color: #1e293b; }
+        .al-n { font-size: 11px; color: #b4c0ce; margin-top: 9px; }
         .db-go { font-size: 13px; color: #334155; line-height: 1.7; margin: 0 0 12px;
                  padding-top: 12px; border-top: 1px dashed #fde68a; word-break: keep-all; }
         .db-btn { display: block; text-align: center; background: #1d4ed8; color: #fff; padding: 12px;
@@ -202,6 +219,11 @@
         .privacy-body dd { margin: 4px 0 0; font-size: 13px; color: #475569; line-height: 1.65; word-break: keep-all; }
         .privacy-body dd b { color: #1e293b; }
         .privacy-body .pv-foot { margin-top: 16px; padding-top: 12px; border-top: 1px dashed #e2e8f0; font-size: 12px; color: #94a3b8; line-height: 1.6; word-break: keep-all; }
+        .privacy-body .pv-ex { background: #f1f5f9; padding: 0 5px; border-radius: 4px; font-size: .95em; }
+        .privacy-body .pv-why { background: #eff6ff; border-radius: 9px; padding: 11px 13px; margin: 9px 0; }
+        .privacy-body .pv-why div { font-size: 12.5px; color: #1e3a8a; line-height: 1.7; margin-bottom: 5px; }
+        .privacy-body .pv-why div:last-child { margin-bottom: 0; }
+        .privacy-body .pv-why b { color: #1e40af; }
 
         /* 저작권·오픈소스 고지 */
         .legal-note { text-align: center; padding: 14px 8px 28px; line-height: 1.7; }
@@ -251,33 +273,30 @@
                     <div class="dbk-r"><span>교원 비밀번호</span><b id="demo-tpw">—</b></div>
                     <div class="dbk-r"><span>관리자 비밀번호</span><b id="demo-apw">—</b></div>
                 </div>
+                <div class="db-hint">👇 아래 버튼을 누르면 <b>비밀번호가 자동으로 채워져</b> 바로 들어갑니다</div>
                 <div class="db-try">
-                    <button onclick="enterDemo('teacher')" class="dbt-btn">👤 교원으로 체험</button>
-                    <button onclick="enterDemo('admin')" class="dbt-btn">👑 담당자로 체험</button>
+                    <button onclick="enterDemo('teacher')" class="dbt-btn">
+                        <span class="dbt-e">👤</span>
+                        <span class="dbt-t">교원으로<br>체험하기</span>
+                    </button>
+                    <button onclick="enterDemo('admin')" class="dbt-btn">
+                        <span class="dbt-e">👑</span>
+                        <span class="dbt-t">담당자로<br>체험하기</span>
+                    </button>
                 </div>
                 <p class="db-go">써 보시고 괜찮으면, <b>우리 학교 계정에 설치</b>해 운영하세요.
                    자료가 학교 밖으로 나가지 않습니다.</p>
                 <a id="install-link" href="#" target="_blank" rel="noopener" class="db-btn">📦 우리 학교에 설치하기</a>
             </div>
 
-            <!-- 역할 선택 -->
-            <div class="space-y-3">
-                <button onclick="showScreen('screen-admin-menu')" class="role-card admin">
-                    <div class="rc-icon">👑</div>
-                    <div class="rc-body">
-                        <h3>관리자로 둘러보기</h3>
-                        <p>명단 관리·전체 현황·엑셀 내려받기</p>
-                    </div>
-                    <div class="rc-arrow">›</div>
-                </button>
-                <button onclick="showScreen('screen-user-start')" class="role-card user">
-                    <div class="rc-icon">👤</div>
-                    <div class="rc-body">
-                        <h3>교원으로 참여</h3>
-                        <p>그룹 접속·지출 내역 입력·잔액 확인</p>
-                    </div>
-                    <div class="rc-arrow">›</div>
-                </button>
+            <!-- 이미 쓰고 계신 학교용 (체험이 주가 되도록 무게를 낮춘다) -->
+            <div class="already">
+                <div class="al-t">이미 이 사이트를 쓰고 계신 학교라면</div>
+                <div class="al-row">
+                    <button onclick="showScreen('screen-user-start')" class="al-btn">👤 교원으로 접속</button>
+                    <button onclick="showScreen('screen-admin-menu')" class="al-btn">👑 담당자 로그인</button>
+                </div>
+                <div class="al-n">그룹명과 비밀번호를 직접 입력해 들어갑니다</div>
             </div>
 
             <!-- 사용 순서 -->
@@ -303,9 +322,9 @@
 
             <!-- 신뢰 뱃지 -->
             <div class="trust-row">
-                <div class="trust-chip">🔒 데이터 실시간 저장</div>
-                <div class="trust-chip">💻 설치 없이 사용</div>
-                <div class="trust-chip">✅ 무료 서비스</div>
+                <div class="trust-chip">🏫 학교 계정에 설치</div>
+                <div class="trust-chip">🙅 이름·이메일 안 받음</div>
+                <div class="trust-chip">✅ 무료</div>
             </div>
 
             <!-- 개인정보 처리 안내 -->
@@ -313,46 +332,55 @@
                 <summary>🛡️ 개인정보 처리 안내</summary>
                 <div class="privacy-body">
                     <dl>
-                        <dt>수집하는 항목</dt>
+                        <dt>이곳은 체험용입니다</dt>
                         <dd>
-                            · 그룹: 그룹명, 접속용 비밀번호<br>
-                            · 교원: 담당(학년·반 등), 본인 확인용 비밀번호<br>
-                            · 정산 자료: 지출 항목명, 금액, 분류, 입력 일시<br><br>
-                            <b>이름·이메일 주소를 수집하지 않습니다.</b> 명단은 '1학년 1반'처럼 담당으로만 관리하며,
-                            로그인에도 이메일을 쓰지 않습니다. 주민등록번호·연락처·계좌번호·카드번호도 수집하지 않습니다.<br>
-                            즉 <b>이 서비스에 저장되는 자료만으로는 개인을 특정할 수 없습니다.</b>
+                            실제 정산에 쓰는 곳이 아닙니다. <b>누구나 들어와 볼 수 있으니 실제 자료를 넣지 말아 주세요.</b>
+                            입력하신 내용은 예고 없이 지워집니다.
                         </dd>
 
-                        <dt>이용 목적</dt>
-                        <dd>자율연수비 집행 현황 확인과 정산 결과 엑셀 산출에만 사용하며, <b>광고·마케팅 목적으로 사용하지 않습니다.</b></dd>
-
-                        <dt>누가 볼 수 있나요</dt>
+                        <dt>받지 않는 것</dt>
                         <dd>
-                            명단 화면에는 <b>담당(학년·반)만 표시</b>되며, 지출 내역은 본인이 정한 비밀번호를 입력해야 열립니다.
-                            다른 학교(그룹)의 자료는 서로 볼 수 없습니다.
-                            이 비밀번호는 다른 곳에서 쓰는 것을 그대로 사용하지 마시고,
-                            지출 항목명에는 알려지길 원치 않는 내용을 적지 말아 주세요.
+                            <b>이름 · 이메일 주소 · 연락처 · 주민등록번호 · 계좌번호를 일절 받지 않습니다.</b>
+                            로그인에도 이메일을 쓰지 않습니다.
+                            그래서 여기에 남는 자료만으로는 <b>누구인지 알아볼 수 없습니다.</b>
+                        </dd>
+
+                        <dt>저장되는 것</dt>
+                        <dd>
+                            그룹명, 담당(<span class="pv-ex">1학년 1반</span> 등), 본인 확인용 비밀번호,
+                            지출 항목명·금액·입력 일시.<br>
+                            명단 화면에는 담당만 표시되고, 지출 내역은 본인 비밀번호를 넣어야 열립니다.
+                        </dd>
+
+                        <dt>왜 학교에 설치해서 쓰나요</dt>
+                        <dd>
+                            이 체험 사이트의 자료는 <b>만든이의 저장소</b>에 쌓입니다.
+                            잠깐 둘러보는 데는 문제가 없지만,
+                            <b>학교의 실제 정산 자료를 남의 저장소에 두는 것은 다른 문제</b>입니다.<br>
+                            학교가 직접 설치하시면 이렇게 달라집니다.
+                            <div class="pv-why">
+                                <div><b>①</b> 자료가 <b>학교 계정 안에만</b> 머뭅니다. 만든이도 열어볼 수 없습니다.</div>
+                                <div><b>②</b> 학교가 <b>직접 관리</b>하는 것이 되어, 외부에 맡기는 절차가 필요 없습니다.</div>
+                                <div><b>③</b> 학년도가 끝나면 <b>학교가 스스로 지울</b> 수 있습니다.</div>
+                                <div><b>④</b> 만든이의 사정과 관계없이 <b>계속 쓰실</b> 수 있습니다.</div>
+                            </div>
+                            설치는 한 번만 하면 되고, 안내서를 따라 20분이면 끝납니다.
                         </dd>
 
                         <dt>국외 이전</dt>
                         <dd>
-                            · 이전받는 자: <b>Google LLC</b> (Google Firebase)<br>
-                            · 이전 국가: <b>미국</b> 등 Google이 운영하는 데이터센터 소재 국가<br>
-                            · 이전 시기·방법: 서비스 이용 시점에 <b>정보통신망을 통해 전송</b><br>
-                            · 이전 항목: 그룹명, 담당(학년·반), 접속용·본인 확인용 비밀번호, 지출 내역<br>
-                            · 이용 목적 및 보유 기간: 자료의 저장·조회, 학년도 종료 후 삭제<br>
-                            · 거부 방법과 효과: 이 서비스를 이용하지 않으시면 되며,
-                            이 경우 기존의 종이·엑셀 방식으로 정산하실 수 있습니다.
+                            체험 자료는 Google Firebase에 저장되며, 아래 나라로 이전됩니다.<br>
+                            · 이전받는 자: <b>Google LLC</b> &nbsp;· 이전 국가: <b>미국</b> 등 Google 데이터센터 소재 국가<br>
+                            · 이전 시기·방법: 이용 시점에 정보통신망을 통해 전송<br>
+                            · 이전 항목: 위 '저장되는 것'과 같음 &nbsp;· 보유 기간: 수시 삭제<br>
+                            · 거부 방법: 이 사이트를 이용하지 않으시면 되며, 체험을 하지 않아도 설치본은 받으실 수 있습니다.
                         </dd>
 
-                        <dt>보관 장소</dt>
-                        <dd>Google Firebase(Firestore·Authentication)에 저장되며, 전송 구간은 암호화(HTTPS)됩니다. 서비스 운영 외의 목적으로 <b>제3자에게 제공하지 않습니다.</b></dd>
-
-                        <dt>보관 기간 및 파기</dt>
-                        <dd>해당 <b>학년도 종료(다음 해 3월) 이후</b> 지난 학년도 자료로 분류되어 삭제될 수 있습니다. 필요한 자료는 학년도가 끝나기 전에 <b>엑셀 다운로드</b>로 보관해 주세요.</dd>
-
-                        <dt>열람·수정·삭제</dt>
-                        <dd>지출 내역은 기록의 신뢰성을 위해 <b>입력 후 수정·삭제할 수 없습니다.</b> 잘못 입력하신 경우 관리자에게 알려 주세요. 명단에서 본인 정보의 삭제를 원하시면 관리자에게 요청하실 수 있으며, 그룹 전체 자료의 삭제는 시스템 관리자에게 요청해 처리합니다.</dd>
+                        <dt>보관 기간</dt>
+                        <dd>
+                            체험 자료는 <b>정해진 기간 없이 수시로 지웁니다.</b>
+                            예고 없이 사라지므로 남겨 두실 내용을 넣지 말아 주세요.
+                        </dd>
 
                         <dt>브라우저 저장</dt>
                         <dd>접속 상태 유지를 위해 최소한의 정보만 브라우저에 임시 저장하며, <b>브라우저 탭을 닫으면 사라집니다.</b> 광고 추적 목적의 쿠키는 사용하지 않습니다.</dd>
