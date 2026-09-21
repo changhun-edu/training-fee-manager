@@ -408,8 +408,7 @@
             </div>
             <div class="flex flex-col gap-1 text-sm bg-blue-50 p-4 rounded-lg text-blue-800 mb-4 border border-blue-100">
                 <span class="font-bold">💡 잔액을 모두 사용한 분은 목록에서 숨겨집니다.</span>
-                <span>🙋 본인 이름을 처음 클릭할 때 비밀번호를 설정합니다. 다른 분이 실수로 남의 칸에 입력하는 것을 막기 위한 장치입니다.</span>
-                <span class="text-blue-900 font-semibold">👀 이 그룹에 접속한 선생님은 서로의 이름·집행 현황을 볼 수 있습니다. 민감한 내용은 항목명에 적지 말아 주세요.</span>
+                <span>🔒 본인 이름을 처음 클릭할 때 비밀번호를 설정합니다.</span>
             </div>
             <div id="member-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 overflow-y-auto pb-10"></div>
         </div>
@@ -1107,9 +1106,7 @@
                 '\u25b7 접속 주소: ' + url + '\n' +
                 '\u25b7 그룹명: ' + name + '\n' +
                 '\u25b7 비밀번호: ' + teacherPw + '\n\n' +
-                '\u203b 접속 후 본인 구분을 선택하고 개인 비밀번호를 설정한 뒤 지출 내역을 입력해 주세요.\n' +
-                '\u203b 같은 그룹에 접속한 선생님끼리는 서로의 이름과 집행 현황을 볼 수 있습니다.\n' +
-                '\u203b 개인 비밀번호는 실수 방지용이니, 다른 곳에서 쓰는 비밀번호는 사용하지 마세요.';
+                '\u203b 접속 후 본인 구분을 선택하고 개인 비밀번호를 설정한 뒤 지출 내역을 입력해 주세요.';
 
             document.getElementById('created-guide').innerHTML =
                 '<div class="g-label">접속 주소</div>' +
