@@ -132,6 +132,52 @@
         .trust-row { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
         .trust-chip { display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700; color: #475569; background: #fff; border: 1.5px solid #e2e8f0; padding: 6px 12px; border-radius: 99px; }
 
+        /* 체험 중 상단 띠 */
+        #demo-top { position: fixed; top: 0; left: 0; right: 0; z-index: 40; }
+        #demo-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+                    background: #1e3a8a; color: #dbeafe; padding: 8px 14px; font-size: 12px; }
+        #demo-bar.hidden, #demo-hint.hidden { display: none !important; }
+        .dbar-badge { background: #1d4ed8; color: #fff; font-weight: 800; font-size: 11px;
+                      padding: 2px 9px; border-radius: 99px; white-space: nowrap; }
+        .dbar-role { background: rgba(219,234,254,.18); border: 1px solid rgba(219,234,254,.35);
+                     border-radius: 99px; padding: 2px 10px; font-weight: 800; color: #fff; white-space: nowrap; }
+        .dbar-msg { opacity: .85; word-break: keep-all; }
+        .dbar-btn { font-family: inherit; font-size: 11.5px; font-weight: 800; cursor: pointer;
+                    background: #dbeafe; color: #1e3a8a; border: none; border-radius: 99px;
+                    padding: 4px 11px; white-space: nowrap; transition: all .12s; }
+        .dbar-btn:hover { background: #fff; transform: translateY(-1px); }
+        .dbar-btn:active { transform: translateY(0); }
+        .dbar-btn.ghost { background: transparent; color: #bfdbfe; border: 1px solid rgba(191,219,254,.45); }
+        .dbar-btn.ghost:hover { background: rgba(191,219,254,.15); color: #fff; }
+        #dbar-switch { margin-left: auto; }
+
+        /* 화면별 길잡이 */
+        #demo-hint { display: flex; align-items: flex-start; gap: 8px;
+                     background: #eff6ff; border-bottom: 1px solid #bfdbfe;
+                     padding: 8px 14px; font-size: 12px; line-height: 1.6; color: #1e40af; }
+        #demo-hint b { font-weight: 800; color: #1e3a8a; }
+        .dhint-x { font-family: inherit; margin-left: auto; flex-shrink: 0; cursor: pointer;
+                   background: transparent; border: none; color: #93c5fd; font-size: 14px;
+                   line-height: 1; padding: 0 2px; }
+        .dhint-x:hover { color: #1e40af; }
+        @media (max-width: 480px) {
+            #demo-bar { font-size: 11px; padding: 7px 10px; gap: 6px; }
+            .dbar-msg { display: none; }
+            #demo-hint { font-size: 11.5px; padding: 7px 10px; }
+        }
+
+        /* 체험 자료 준비 중 표시 */
+        #demo-busy { position: fixed; inset: 0; z-index: 60; background: rgba(15, 23, 42, .45);
+                     display: flex; align-items: center; justify-content: center; padding: 20px; }
+        #demo-busy.hidden { display: none !important; }
+        .db-busy-card { background: #fff; border-radius: 16px; padding: 26px 28px; text-align: center;
+                        box-shadow: 0 18px 40px rgba(15, 23, 42, .25); max-width: 300px; }
+        .db-busy-spin { width: 30px; height: 30px; margin: 0 auto 14px; border-radius: 50%;
+                        border: 3px solid #dbeafe; border-top-color: #1d4ed8; animation: dbspin .8s linear infinite; }
+        @keyframes dbspin { to { transform: rotate(360deg); } }
+        .db-busy-t { font-size: 14px; font-weight: 800; color: #1e293b; word-break: keep-all; }
+        .db-busy-s { font-size: 12px; color: #94a3b8; margin-top: 5px; }
+
         /* 화면 안쪽 체험 안내 띠 */
         .demo-note { background: #eff6ff; border: 2px solid #bfdbfe; border-radius: 12px;
                      padding: 13px 15px; color: #1e40af; }
@@ -254,6 +300,30 @@
 <body class="relative">
     <div id="super-admin-trigger" class="fixed bottom-2 right-2 text-[10px] text-gray-400 opacity-60 z-50 cursor-pointer hover:opacity-100 transition-opacity p-2">만든이 © 2026 최창훈</div>
 
+    <!-- 체험 중 상단 띠 (역할 표시·전환) + 화면별 길잡이 -->
+    <div id="demo-top">
+        <div id="demo-bar" class="hidden">
+            <span class="dbar-badge">체험 중</span>
+            <span class="dbar-role" id="dbar-role">교원</span>
+            <span class="dbar-msg">실제 자료는 넣지 말아 주세요</span>
+            <button class="dbar-btn" id="dbar-switch" onclick="switchDemoRole()">담당자로 바꾸기</button>
+            <button class="dbar-btn ghost" onclick="logout()">나가기</button>
+        </div>
+        <div id="demo-hint" class="hidden">
+            <span id="demo-hint-t"></span>
+            <button class="dhint-x" onclick="dismissDemoHint()" aria-label="닫기">✕</button>
+        </div>
+    </div>
+
+    <!-- 체험 자료를 준비하는 동안 잠깐 덮어 두는 화면 -->
+    <div id="demo-busy" class="hidden">
+        <div class="db-busy-card">
+            <div class="db-busy-spin"></div>
+            <div class="db-busy-t">체험 자료를 준비하는 중입니다…</div>
+            <div class="db-busy-s">잠시만 기다려 주세요</div>
+        </div>
+    </div>
+
     <div id="app" class="max-w-5xl mx-auto min-h-screen p-4 flex flex-col justify-center w-full">
         
         <div id="screen-home" class="max-w-md w-full mx-auto space-y-4">
@@ -283,8 +353,9 @@
             <div class="demo-box">
                 <div class="db-badge">체험용</div>
                 <p class="db-lead">이 사이트는 <b>어떻게 돌아가는지 직접 써 보시는 곳</b>입니다.
+                   가상의 학교 명단과 지출 내역이 <b>미리 들어 있어</b>, 들어가시면 잔액 계산·엑셀 내려받기를 바로 확인하실 수 있습니다.<br>
                    아무나 들어와 볼 수 있으니 <b>실제 자료는 넣지 말아 주세요.</b>
-                   입력하신 내용은 예고 없이 지워집니다.</p>
+                   입력하신 내용은 <b>다음 방문자를 위해 처음 상태로 되돌아갑니다.</b></p>
                 <div class="db-key">
                     <div class="dbk-t">체험 계정</div>
                     <div class="dbk-r"><span>그룹명</span><b id="demo-group">—</b></div>
@@ -554,6 +625,7 @@
                 <h2 id="admin-display-group-name" class="text-xl md:text-2xl font-bold text-gray-800">그룹명 (관리자)</h2>
                 <div class="flex gap-2">
                     <button id="excel-btn" onclick="downloadExcel()" class="text-xs bg-green-600 text-white px-3 py-2 rounded font-bold hover:bg-green-700 shadow">📥 엑셀 다운로드</button>
+                    <button id="demo-reset-btn" onclick="resetDemoNow()" class="hidden text-xs bg-blue-600 text-white px-3 py-2 rounded font-bold hover:bg-blue-700 shadow">🔄 체험 자료 되돌리기</button>
                     <button onclick="changeAdminPassword()" class="text-xs bg-gray-600 text-white px-3 py-2 rounded font-bold hover:bg-gray-700 shadow">🔑 관리자 비번</button>
                     <button onclick="changeTeacherPassword()" class="text-xs bg-gray-600 text-white px-3 py-2 rounded font-bold hover:bg-gray-700 shadow">👥 교원 비번</button>
                     <button onclick="logout()" class="text-xs text-red-500 border border-red-500 px-3 py-2 rounded hover:bg-red-50 font-bold">로그아웃</button>
@@ -1205,6 +1277,9 @@
             if (!fromHistory && (!history.state || history.state.screen !== screenId)) {
                 history.pushState({ screen: screenId }, '');
             }
+
+            // 체험 중 상단 띠·길잡이를 이 화면에 맞게 고쳐 그린다
+            try { updateDemoChrome(screenId); } catch (e) {}
         }
 
         // 뒤로가기 / 앞으로가기 처리
@@ -1354,6 +1429,9 @@
             dashboardScreen = 'screen-admin-dashboard';
             document.getElementById('admin-display-group-name').innerText = name + ' (관리자)';
             showRetentionNotice(createdAt);
+            // 체험 그룹에서만 [체험 자료 되돌리기] 버튼을 보여 준다
+            const rb = document.getElementById('demo-reset-btn');
+            if (rb) rb.classList.toggle('hidden', !isDemoGroup());
             loadAdminDashboard();
             showScreen('screen-admin-dashboard');
         }
@@ -2049,8 +2127,308 @@
             //   체험은 아래 버튼으로 한 번에 들어가도록 한다.
         })();
 
+        /* ══════════════════════════════════════════════════════════════
+           체험 자료 ─ 이 체험 사이트에서만 쓰는 부분입니다
+           (학교 설치본에는 없어도 그만인 기능입니다)
+
+           ① 체험으로 들어올 때 샘플 명단·지출이 비어 있으면 채워 넣습니다.
+           ② 앞사람이 건드려 놓았으면 처음 상태로 되돌립니다.
+              다만 마지막 입력이 DEMO_GRACE_MIN분 안쪽이면
+              지금 체험 중인 분의 화면이 사라지지 않도록 그대로 둡니다.
+           ══════════════════════════════════════════════════════════════ */
+        const DEMO_GRACE_MIN = 20;   // 이 시간 안에 입력이 있었으면 되돌리지 않는다
+
+        // d: 며칠 전인지 (학년도 시작 이전으로는 내려가지 않게 맞춥니다)
+        const DEMO_SAMPLE = [
+            { role: '교장',      expenses: [
+                { category: '연수',     item: '학교경영 직무연수',         amount: 120000, d: 150 },
+                { category: '도서구입', item: '학교경영 도서 3권',         amount: 54000,  d: 96  } ] },
+            { role: '교감',      expenses: [
+                { category: '연수',     item: '교육과정 리더십 직무연수',   amount: 150000, d: 140 },
+                { category: '도서구입', item: '수업 장학 도서 4권',         amount: 100000, d: 60  } ] },
+            { role: '1학년 1반', expenses: [
+                { category: '연수',     item: '한글 책임교육 직무연수',     amount: 80000,  d: 120 } ] },
+            { role: '1학년 2반', expenses: [] },
+            { role: '2학년 1반', isReturning: true, expenses: [
+                { category: '도서구입', item: '학급운영 도서 2권',          amount: 45000,  d: 110 },
+                { category: '연수',     item: '놀이 중심 수업 연수',        amount: 60000,  d: 35  } ] },
+            { role: '3학년 1반', expenses: [
+                { category: '연수',     item: '원격직무연수 「교실 속 AI」', amount: 200000, d: 80  } ] },
+            { role: '4학년 1반', expenses: [] },
+            { role: '5학년 1반', expenses: [
+                { category: '도서구입', item: '독서교육 도서 구입',         amount: 38000,  d: 70  },
+                { category: '도서구입', item: '수업 자료 도서 2권',         amount: 42000,  d: 40  } ] },
+            { role: '6학년 1반', expenses: [
+                { category: '연수',     item: '진로교육 집합연수',          amount: 250000, d: 130 } ] },
+            { role: '교담 체육', expenses: [
+                { category: '연수',     item: '학교 스포츠클럽 지도자 연수', amount: 90000,  d: 55  } ] },
+            { role: '보건',      expenses: [
+                { category: '도서구입', item: '보건교육 도서 2권',          amount: 33000,  d: 45  } ] },
+            { role: '영양',      expenses: [] }
+        ];
+
+        function demoGroupId()   { return DEMO.group.replace(/\s+/g, '_'); }
+        function isDemoGroup()   { return currentGroupId === demoGroupId(); }
+        function sampleTotal(s)  { return s.expenses.reduce((t, e) => t + e.amount, 0); }
+
+        /** 샘플 지출의 날짜 — 며칠 전으로 잡되 이번 학년도를 벗어나지 않게 한다 */
+        function sampleDate(daysAgo) {
+            const now = new Date();
+            const startYear = now.getMonth() >= 2 ? now.getFullYear() : now.getFullYear() - 1;
+            const floor = new Date(startYear, 2, 8);           // 학년도 시작(3월) 직후
+            const want = new Date(now.getTime() - daysAgo * 86400000);
+            return (want < floor ? floor : want).toISOString();
+        }
+
+        /** 명단 상태를 한 줄로 요약해 샘플과 견준다 */
+        function signatureOf(list) {
+            return list.map(m => [m.role, m.spent, m.returning ? 'R' : '-', m.pin ? 'P' : '-'].join(':'))
+                       .sort().join('|');
+        }
+        function sampleSignature() {
+            return signatureOf(DEMO_SAMPLE.map(s => ({
+                role: s.role, spent: sampleTotal(s), returning: !!s.isReturning, pin: false
+            })));
+        }
+
+        /** 최근 DEMO_GRACE_MIN분 안에 입력한 사람이 있는지 본다 */
+        async function demoRecentlyUsed(membersSnap) {
+            const limit = Date.now() - DEMO_GRACE_MIN * 60000;
+            for (const m of membersSnap.docs.slice(0, 30)) {
+                try {
+                    const snap = await m.ref.collection('expenses').orderBy('date', 'desc').limit(1).get();
+                    if (!snap.empty) {
+                        const t = Date.parse(snap.docs[0].data().date || '');
+                        if (t && t > limit) return true;
+                    }
+                } catch (e) { /* 읽지 못하면 건너뛴다 */ }
+            }
+            return false;
+        }
+
+        /** 체험 자료를 확인하고, 필요하면 처음 상태로 되돌린다 */
+        async function ensureDemoSample(force) {
+            const members = db.collection('groups').doc(demoGroupId()).collection('members');
+            const snap = await members.get();
+
+            if (snap.empty) { await seedDemoData(); return true; }
+            if (!force) {
+                const now = signatureOf(snap.docs.map(d => {
+                    const v = d.data();
+                    return { role: v.role, spent: v.spentAmount || 0, returning: !!v.isReturning, pin: !!v.pin };
+                }));
+                if (now === sampleSignature()) return false;          // 그대로면 둔다
+                if (await demoRecentlyUsed(snap)) return false;       // 누가 쓰는 중이면 둔다
+            }
+            await wipeDemoData(snap);
+            await seedDemoData();
+            return true;
+        }
+
+        /** 명단과 지출을 지운다 (지출 삭제가 규칙에 막히면 명단만 지운다) */
+        async function wipeDemoData(snap) {
+            const docs = snap.docs;
+
+            // ① 지출 내역 — 총괄 관리자만 지울 수 있게 되어 있으면 조용히 넘어간다
+            try {
+                const batch = db.batch();
+                let n = 0;
+                for (const m of docs) {
+                    const exps = await m.ref.collection('expenses').get();
+                    exps.forEach(e => { batch.delete(e.ref); n++; });
+                }
+                if (n) await batch.commit();
+            } catch (e) { /* 규칙이 막으면 그대로 진행 */ }
+
+            // ② 사용액을 0으로 되돌린다 (0이어야 명단을 지울 수 있다)
+            try {
+                const batch = db.batch();
+                docs.forEach(m => batch.update(m.ref, { spentAmount: 0, isCompleted: false, isReturning: false }));
+                await batch.commit();
+            } catch (e) { /* 실패해도 아래에서 다시 시도한다 */ }
+
+            // ③ 명단 삭제
+            const batch = db.batch();
+            docs.forEach(m => batch.delete(m.ref));
+            await batch.commit();
+        }
+
+        /** 샘플 명단과 지출을 새로 넣는다 (관리자 계정으로 로그인한 상태여야 한다) */
+        async function seedDemoData() {
+            const members = db.collection('groups').doc(demoGroupId()).collection('members');
+
+            // ① 명단과 지출을 한 번에 만든다 (규칙상 사용액은 0으로 시작해야 한다)
+            const created = [];
+            const batch = db.batch();
+            DEMO_SAMPLE.forEach(s => {
+                const ref = members.doc();
+                batch.set(ref, { role: s.role, name: '', spentAmount: 0, isCompleted: false, pin: null, isReturning: false });
+                s.expenses.forEach(e => {
+                    batch.set(ref.collection('expenses').doc(), {
+                        item: e.item, amount: e.amount, category: e.category, date: sampleDate(e.d)
+                    });
+                });
+                created.push({ ref: ref, sample: s });
+            });
+            await batch.commit();
+
+            // ② 사용액·반납희망을 채운다
+            const batch2 = db.batch();
+            created.forEach(c => {
+                const total = sampleTotal(c.sample);
+                batch2.update(c.ref, {
+                    spentAmount: total,
+                    isCompleted: (250000 - total) <= 0,
+                    isReturning: !!c.sample.isReturning
+                });
+            });
+            await batch2.commit();
+        }
+
+        /* ── 체험 중 상단 띠 · 화면별 길잡이 ──────────────────────────
+           체험자가 지금 어느 역할로 무엇을 보고 있는지 알려 주고,
+           교원 ↔ 담당자 화면을 한 번에 오갈 수 있게 합니다.
+           ───────────────────────────────────────────────────────── */
+        const DEMO_HINTS = {
+            'screen-user-start':
+                '그룹명과 비밀번호가 <b>이미 채워져</b> 있습니다. [접속하기]만 누르시면 됩니다.',
+            'screen-admin-login':
+                '체험용 그룹명과 관리자 비밀번호가 <b>이미 채워져</b> 있습니다. [로그인]을 눌러 주세요.',
+            'screen-user-dashboard':
+                '<b>선생님이 보는 화면</b>입니다. 본인 칸을 누르면 개인 비밀번호를 정한 뒤 지출을 입력합니다. 잔액을 다 쓴 분은 목록에서 숨겨집니다.',
+            'screen-member-form':
+                '내역을 추가하면 <b>잔액이 바로 줄어듭니다.</b> 남은 돈을 반납하실 분은 [반납 안함]을 눌러 표시해 두시면 됩니다.',
+            'screen-admin-dashboard':
+                '<b>담당자가 보는 화면</b>입니다. 전체 현황을 한눈에 보고 [📥 엑셀 다운로드]로 정산 자료를 받습니다. 샘플을 흐트러뜨렸다면 [🔄 체험 자료 되돌리기]를 누르세요.',
+            'screen-admin-start':
+                '체험 사이트에서는 <b>총괄 관리자만</b> 그룹을 만들 수 있습니다. 학교에서 쓰실 때는 담당자가 직접 만드는 화면입니다.'
+        };
+        const demoHintClosed = new Set();
+
+        function demoRoleNow() { return dashboardScreen === 'screen-admin-dashboard' ? 'admin' : 'teacher'; }
+
+        /** 로그인 화면에 체험 그룹명이 채워져 있는지 (아직 들어가기 전 단계) */
+        function demoPrefilled(screenId) {
+            const el = screenId === 'screen-admin-login' ? document.getElementById('login-group-name')
+                     : screenId === 'screen-user-start'  ? document.getElementById('user-group-name')
+                     : null;
+            return !!(el && el.value.trim() === DEMO.group);
+        }
+
+        /** 화면이 바뀔 때마다 띠와 길잡이를 다시 그린다 */
+        function updateDemoChrome(screenId) {
+            const bar  = document.getElementById('demo-bar');
+            const hint = document.getElementById('demo-hint');
+            if (!bar || !hint) return;
+
+            // ① 상단 띠 — 체험 그룹에 들어와 있을 때만
+            const inDemo = isDemoGroup() && screenId !== 'screen-home' && screenId !== 'screen-super-admin';
+            if (inDemo) {
+                const role = demoRoleNow();
+                document.getElementById('dbar-role').textContent = role === 'admin' ? '담당자' : '교원';
+                document.getElementById('dbar-switch').textContent =
+                    role === 'admin' ? '교원 화면으로' : '담당자 화면으로';
+                bar.classList.remove('hidden');
+            } else {
+                bar.classList.add('hidden');
+            }
+
+            // ② 길잡이 — 화면마다 한 줄, 닫으면 그 화면은 다시 띄우지 않는다
+            const text = DEMO_HINTS[screenId];
+            const show = text && !demoHintClosed.has(screenId)
+                      && (inDemo || demoPrefilled(screenId));
+            if (show) {
+                document.getElementById('demo-hint-t').innerHTML = '💡 ' + text;
+                hint.dataset.screen = screenId;
+                hint.classList.remove('hidden');
+            } else {
+                hint.classList.add('hidden');
+            }
+
+            // ③ 띠에 가려지지 않도록 본문을 아래로 민다
+            const top = document.getElementById('demo-top');
+            document.body.style.paddingTop =
+                (bar.classList.contains('hidden') && hint.classList.contains('hidden'))
+                    ? '' : top.offsetHeight + 'px';
+        }
+
+        function dismissDemoHint() {
+            const hint = document.getElementById('demo-hint');
+            if (hint.dataset.screen) demoHintClosed.add(hint.dataset.screen);
+            hint.classList.add('hidden');
+            const top = document.getElementById('demo-top');
+            const bar = document.getElementById('demo-bar');
+            document.body.style.paddingTop = bar.classList.contains('hidden') ? '' : top.offsetHeight + 'px';
+        }
+
+        /** 교원 ↔ 담당자 화면 바꾸기 (체험 계정이라 비밀번호를 알고 있으므로 바로 전환한다) */
+        async function switchDemoRole() {
+            const to = demoRoleNow() === 'admin' ? 'teacher' : 'admin';
+            demoBusy(to === 'admin' ? '담당자 화면으로 바꾸는 중입니다…' : '교원 화면으로 바꾸는 중입니다…');
+            try {
+                const gid = demoGroupId();
+                const emails = await groupEmails(gid);
+                if (to === 'admin') {
+                    await firebase.auth().signInWithEmailAndPassword(emails.admin, DEMO.adminPw);
+                    const doc = await db.collection('groups').doc(gid).get();
+                    enterAdminGroup(gid, doc.data().name,
+                        doc.data().createdAt ? doc.data().createdAt.toDate() : null);
+                } else {
+                    await firebase.auth().signInWithEmailAndPassword(emails.teacher, DEMO.teacherPw);
+                    const doc = await db.collection('groups').doc(gid).get();
+                    currentGroupId = gid;
+                    saveSession('teacher', gid);
+                    dashboardScreen = 'screen-user-dashboard';
+                    document.getElementById('display-group-name').innerText = doc.data().name;
+                    loadMembers();
+                    showScreen('screen-user-dashboard');
+                }
+            } catch (e) {
+                alert('화면을 바꾸지 못했습니다.\n' + authErrorMessage(e));
+            }
+            demoBusy(null);
+        }
+
+        /** 관리자 화면의 [체험 자료 되돌리기] 버튼 */
+        async function resetDemoNow() {
+            if (!confirm('체험 자료를 처음 상태로 되돌립니다.\n\n' +
+                         '지금 들어 있는 명단과 지출 내역이 모두 지워지고,\n' +
+                         '샘플 자료가 새로 채워집니다. 계속할까요?')) return;
+            demoBusy('체험 자료를 되돌리는 중입니다…');
+            try {
+                await ensureDemoSample(true);
+                demoBusy(null);
+                alert('체험 자료를 처음 상태로 되돌렸습니다.');
+            } catch (e) {
+                demoBusy(null);
+                alert('되돌리지 못했습니다.\n' + (e && e.message ? e.message : ''));
+            }
+        }
+
+        /** 준비 중 표시 */
+        function demoBusy(msg) {
+            const box = document.getElementById('demo-busy');
+            if (!box) return;
+            if (!msg) return box.classList.add('hidden');
+            box.querySelector('.db-busy-t').textContent = msg;
+            box.classList.remove('hidden');
+        }
+
         // 체험 계정으로 바로 들어가기
-        function enterDemo(role) {
+        async function enterDemo(role) {
+            demoBusy('체험 자료를 준비하는 중입니다…');
+            try {
+                // 명단을 만들 수 있는 것은 관리자 계정뿐이므로, 잠시 관리자로 들어가 자료를 맞춰 둔다
+                const emails = await groupEmails(demoGroupId());
+                await firebase.auth().signInWithEmailAndPassword(emails.admin, DEMO.adminPw);
+                await ensureDemoSample(false);
+                await firebase.auth().signOut();
+            } catch (e) {
+                // 준비에 실패해도 체험 자체는 이어 간다
+                console.warn('체험 자료 준비 실패', e);
+            }
+            demoBusy(null);
+
             if (role === 'admin') {
                 document.getElementById('login-group-name').value = DEMO.group;
                 document.getElementById('login-admin-pw').value = DEMO.adminPw;
