@@ -132,50 +132,39 @@
         .trust-row { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
         .trust-chip { display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700; color: #475569; background: #fff; border: 1.5px solid #e2e8f0; padding: 6px 12px; border-radius: 99px; }
 
-        /* 기존 그룹 사용 기한 안내 */
-        .lg-warn { border-radius: 12px; padding: 14px 16px; border: 2px solid; }
-        .lg-warn > b { display: block; font-size: 14px; font-weight: 800; margin-bottom: 6px; }
-        .lg-warn p { font-size: 12.5px; line-height: 1.65; margin: 0 0 10px; word-break: keep-all; }
-        .lg-ok   { background: #eff6ff; border-color: #bfdbfe; color: #1e3a8a; }
-        .lg-soon { background: #fffbeb; border-color: #fcd34d; color: #78350f; }
-        .lg-over { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
-        .lg-btn { display: inline-block; background: #1d4ed8; color: #fff; padding: 8px 14px;
-                  border-radius: 8px; font-size: 12.5px; font-weight: 800; text-decoration: none; }
-        .lg-btn:hover { background: #1e3a8a; }
+        /* 화면 안쪽 체험 안내 띠 */
+        .demo-note { background: #eff6ff; border: 2px solid #bfdbfe; border-radius: 12px;
+                     padding: 13px 15px; color: #1e40af; }
+        .demo-note > b { display: block; font-size: 13.5px; font-weight: 800; color: #1e3a8a; margin-bottom: 5px; }
+        .demo-note p { font-size: 12.5px; line-height: 1.7; margin: 0 0 9px; word-break: keep-all; }
+        .demo-note .dn-btn { display: inline-block; background: #1d4ed8; color: #fff; padding: 8px 14px;
+                             border-radius: 8px; font-size: 12.5px; font-weight: 800; text-decoration: none; }
+        .demo-note .dn-btn:hover { background: #1e3a8a; }
 
         /* 체험 안내 */
-        .demo-box { background: #fff; border: 2px solid #fcd34d; border-radius: 16px; padding: 18px; position: relative; }
-        .db-badge { position: absolute; top: -11px; left: 16px; background: #f59e0b; color: #fff;
+        .demo-box { background: #fff; border: 2px solid #93c5fd; border-radius: 16px; padding: 18px; position: relative; }
+        .db-badge { position: absolute; top: -11px; left: 16px; background: #1d4ed8; color: #fff;
                     font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 99px; letter-spacing: .5px; }
-        .db-lead { font-size: 13px; color: #78350f; line-height: 1.7; margin: 6px 0 12px; word-break: keep-all; }
-        .db-key { background: #fffbeb; border-radius: 10px; padding: 12px 14px; margin-bottom: 12px; }
-        .dbk-t { font-size: 11px; font-weight: 800; color: #92400e; letter-spacing: .5px; margin-bottom: 7px; }
+        .db-lead { font-size: 13px; color: #1e40af; line-height: 1.7; margin: 6px 0 12px; word-break: keep-all; }
+        .db-lead b { color: #1e3a8a; font-weight: 800; }
+        .db-key { background: #eff6ff; border-radius: 10px; padding: 12px 14px; margin-bottom: 12px; }
+        .dbk-t { font-size: 11px; font-weight: 800; color: #1e40af; letter-spacing: .5px; margin-bottom: 7px; }
         .dbk-r { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 3px 0; }
-        .dbk-r span { font-size: 12px; color: #a16207; }
-        .dbk-r b { font-size: 13px; color: #78350f; font-family: ui-monospace, Menlo, monospace; word-break: break-all; }
-        .db-hint { font-size: 12px; font-weight: 700; color: #92400e; text-align: center;
+        .dbk-r span { font-size: 12px; color: #3b82f6; }
+        .dbk-r b { font-size: 13px; color: #1e3a8a; font-family: ui-monospace, Menlo, monospace; word-break: break-all; }
+        .db-hint { font-size: 12px; font-weight: 700; color: #1e40af; text-align: center;
                    margin-bottom: 9px; word-break: keep-all; }
         .db-try { display: flex; gap: 10px; margin-bottom: 16px; }
-        .dbt-btn { flex: 1; background: #f59e0b; border: none; color: #fff;
+        .dbt-btn { flex: 1; background: #2563eb; border: none; color: #fff;
                    padding: 16px 8px; border-radius: 12px; cursor: pointer;
                    display: flex; flex-direction: column; align-items: center; gap: 6px;
-                   box-shadow: 0 3px 0 #b45309; transition: all .12s; }
-        .dbt-btn:hover { background: #d97706; }
-        .dbt-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #b45309; }
+                   box-shadow: 0 3px 0 #1e3a8a; transition: all .12s; }
+        .dbt-btn:hover { background: #1d4ed8; }
+        .dbt-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #1e3a8a; }
         .dbt-e { font-size: 26px; line-height: 1; }
         .dbt-t { font-size: 14px; font-weight: 800; line-height: 1.35; }
-
-        /* 직접 입력해 들어가는 길 — 체험보다 시각적 무게를 낮춘다 */
-        .already { background: #fff; border: 1px solid var(--line, #e2e8f0); border-radius: 12px;
-                   padding: 14px 16px; text-align: center; }
-        .al-t { font-size: 12px; font-weight: 700; color: #94a3b8; margin-bottom: 10px; }
-        .al-row { display: flex; gap: 8px; }
-        .al-btn { flex: 1; background: #f8fafc; border: 1px solid #cbd5e1; color: #475569;
-                  font-size: 13px; font-weight: 700; padding: 10px 6px; border-radius: 8px; cursor: pointer; }
-        .al-btn:hover { background: #eef2f7; color: #1e293b; }
-        .al-n { font-size: 11px; color: #b4c0ce; margin-top: 9px; }
         .db-go { font-size: 13px; color: #334155; line-height: 1.7; margin: 0 0 12px;
-                 padding-top: 12px; border-top: 1px dashed #fde68a; word-break: keep-all; }
+                 padding-top: 12px; border-top: 1px dashed #bfdbfe; word-break: keep-all; }
         .db-btn { display: block; text-align: center; background: #1d4ed8; color: #fff; padding: 12px;
                   border-radius: 10px; font-weight: 800; font-size: 14px; text-decoration: none; }
         .db-btn:hover { background: #1e3a8a; }
@@ -218,15 +207,6 @@
                    font-size: 12px; line-height: 1.75; color: #94a3b8; word-break: keep-all; }
         .ld-foot b { color: #475569; font-weight: 700; }
 
-        /* 관리자 메뉴 - 생성 잠금 안내 */
-        .demo-lock { background: #fffbeb; border: 2px solid #fcd34d; border-radius: 14px;
-                     padding: 16px; text-align: left; }
-        .demo-lock .dl-title { font-size: 14px; font-weight: 800; color: #92400e; margin-bottom: 8px; }
-        .demo-lock p { font-size: 12.5px; color: #78350f; line-height: 1.7; margin: 0 0 8px; word-break: keep-all; }
-        .demo-lock .dl-go { color: #334155; }
-        .dl-btn { display: block; text-align: center; background: #1d4ed8; color: #fff; padding: 11px;
-                  border-radius: 9px; font-weight: 800; font-size: 13.5px; text-decoration: none; margin-top: 10px; }
-        .dl-btn:hover { background: #1e3a8a; }
 
         /* 그룹명·비밀번호 보관 경고 */
         .keep-warn { background: #fffbeb; border: 2px solid #fcd34d; border-radius: 12px; padding: 14px 16px; }
@@ -325,15 +305,6 @@
                 <p class="db-go">써 보시고 괜찮으면, <b>우리 학교 계정에 설치</b>해 운영하세요.
                    자료가 학교 밖으로 나가지 않습니다.</p>
                 <a href="#install-section" class="db-btn" onclick="event.preventDefault();goInstallSection();">📦 우리 학교에 설치하기</a>
-            </div>
-
-            <!-- 직접 입력해 들어가는 길 (체험이 주가 되도록 무게를 낮춘다) -->
-            <div class="already">
-                <div class="al-t">그룹명과 비밀번호를 직접 입력해 들어가기</div>
-                <div class="al-row">
-                    <button onclick="showScreen('screen-user-start')" class="al-btn">👤 교원으로 접속</button>
-                    <button onclick="showScreen('screen-admin-menu')" class="al-btn">👑 담당자 로그인</button>
-                </div>
             </div>
 
             <!-- 사용 순서 -->
@@ -507,18 +478,6 @@
 
         </div>
 
-        <div id="screen-admin-menu" class="hidden max-w-md w-full mx-auto space-y-4 text-center">
-            <h2 class="text-2xl font-bold mb-6">관리자 메뉴</h2>
-            <div class="demo-lock">
-                <div class="dl-title">🔒 새 그룹 만들기는 닫혀 있습니다</div>
-                <p>이곳은 <b>체험용 사이트</b>입니다. 아래 체험 계정으로 관리자 화면을 둘러보실 수 있습니다.</p>
-                <p class="dl-go">우리 학교에서 실제로 쓰시려면 <b>설치본</b>을 받아 학교 계정에 설치하세요.
-                   자료가 학교 안에만 저장됩니다.</p>
-                <a id="install-link-2" href="download/install-guide.html" target="_blank" rel="noopener" class="dl-btn">📦 설치본 받기</a>
-            </div>
-            <button onclick="showScreen('screen-admin-login')" class="bg-gray-800 text-white w-full py-4 rounded-lg font-bold hover:bg-gray-700">🔒 체험용 그룹 관리 (로그인)</button>
-            <button onclick="showScreen('screen-home')" class="w-full text-gray-500 py-2 mt-4 hover:underline">뒤로가기</button>
-        </div>
 
         <div id="screen-admin-start" class="hidden max-w-md w-full mx-auto space-y-4">
             <h2 class="text-2xl font-bold mb-4">새 그룹 생성</h2>
@@ -548,7 +507,7 @@
             </div>
 
             <button onclick="createGroup()" class="btn-primary w-full py-3 mt-2">그룹 생성 및 관리 시작</button>
-            <button onclick="showScreen('screen-admin-menu')" class="text-center w-full text-gray-500 py-2 hover:underline">뒤로가기</button>
+            <button onclick="showScreen('screen-home')" class="text-center w-full text-gray-500 py-2 hover:underline">뒤로가기</button>
         </div>
 
         <div id="screen-admin-login" class="hidden max-w-md w-full mx-auto space-y-4">
@@ -566,7 +525,7 @@
                 이메일을 받지 않으므로 <b>비밀번호를 대신 찾아 드릴 수 없습니다.</b><br>
                 적어 두신 곳을 확인해 주세요.
             </p>
-            <button onclick="showScreen('screen-admin-menu')" class="w-full text-gray-500 py-2 hover:underline">뒤로가기</button>
+            <button onclick="showScreen('screen-home')" class="w-full text-gray-500 py-2 hover:underline">뒤로가기</button>
         </div>
 
         <div id="screen-group-select" class="hidden max-w-md w-full mx-auto space-y-4">
@@ -627,7 +586,7 @@
                 <h2 id="display-group-name" class="text-xl md:text-2xl font-bold">그룹명</h2>
                 <button onclick="logout()" class="text-xs text-red-500 border border-red-500 px-3 py-2 rounded hover:bg-red-50 font-bold">나가기</button>
             </div>
-            <div id="user-legacy-notice" class="hidden mb-4"></div>
+            <div id="user-demo-notice" class="hidden mb-4"></div>
             <div class="flex flex-col gap-1 text-sm bg-blue-50 p-4 rounded-lg text-blue-800 mb-4 border border-blue-100">
                 <span class="font-bold">💡 잔액을 모두 사용한 분은 목록에서 숨겨집니다.</span>
                 <span>🔒 본인 이름을 처음 클릭할 때 비밀번호를 설정합니다.</span>
@@ -782,44 +741,7 @@
         const INSTALL_GUIDE = 'download/install-guide.html';  // 설치 안내서
         const INSTALL_URL   = INSTALL_GUIDE;                  // '설치본 받기'를 누르면 안내서부터 보여 준다
 
-        /* 체험장 전환 전부터 쓰고 계시던 그룹 — 정해진 날까지만 열어 둡니다.
-           만료 뒤에는 입력만 막고, 자료를 꺼낼 수 있도록 엑셀 내려받기는 남겨 둡니다.
-           그룹명의 빈칸은 밑줄(_)로 바꿔 적으세요. (예: '2026 도산초 80' → '2026_도산초_80') */
-        const LEGACY_GROUPS = {
-            '2026_도산초_80': '2027-02-28',
-            '2026골약초':     '2027-02-28'
-        };
         /* ════════════════════════════════════════════════════════════ */
-
-        /** 기존 그룹인지, 남은 기간이 얼마인지 알려 준다 */
-        function legacyInfo(groupId) {
-            const until = LEGACY_GROUPS[groupId];
-            if (!until) return null;
-            const end = new Date(until + 'T23:59:59+09:00');
-            const now = new Date();
-            const days = Math.ceil((end - now) / 86400000);
-            return {
-                until: until,
-                end: end,
-                days: days,
-                expired: now > end,
-                soon: days <= 30 && days >= 0,
-                label: (function () {
-                    const t = until.split('-');
-                    return t[0] + '년 ' + Number(t[1]) + '월 ' + Number(t[2]) + '일';
-                })()
-            };
-        }
-
-        /** 만료된 그룹이면 안내하고 true 를 돌려준다 (입력 막기용) */
-        function blockedByExpiry() {
-            const L = legacyInfo(currentGroupId);
-            if (!L || !L.expired) return false;
-            alert('이 그룹의 사용 기간이 끝났습니다. (' + L.label + '까지)\n\n' +
-                  '새로 입력할 수는 없지만, [엑셀 다운로드]로 자료는 내려받으실 수 있습니다.\n' +
-                  '설치본을 받아 학교 계정에 옮겨 주세요.');
-            return true;
-        }
 
         const AUTH_DOMAIN = "@training-fee.local";
 
@@ -1446,56 +1368,21 @@
             }, 60);
         }
 
-        /** 설치본 버튼 — 설치 안내서를 새 탭으로 연다 */
-        function installBtnHTML(cls) {
-            return '<a href="' + INSTALL_GUIDE + '" target="_blank" rel="noopener" class="' + cls + '">📦 설치본 받기</a>';
+        /** 화면 안쪽에 늘 띄워 두는 체험 안내 띠 */
+        function demoNoticeHTML() {
+            return '<div class="demo-note">' +
+                '<b>🧪 체험용 화면입니다</b>' +
+                '<p>여기에 넣은 내용은 <b>예고 없이 지워집니다.</b> 실제 정산 자료는 넣지 말아 주세요.<br>' +
+                '우리 학교에서 쓰시려면 설치본을 받아 학교 계정에 설치하시면 됩니다.</p>' +
+                '<a href="' + INSTALL_GUIDE + '" target="_blank" rel="noopener" class="dn-btn">📦 설치본 받기</a>' +
+                '</div>';
         }
 
-        function legacyBannerHTML(L) {
-            if (L.expired) {
-                return '<div class="lg-warn lg-over">' +
-                    '<b>⛔ 사용 기간이 끝났습니다 (' + L.label + '까지)</b>' +
-                    '<p>새로 입력할 수는 없지만 <b>엑셀 내려받기는 그대로</b> 됩니다. ' +
-                    '자료를 보관하신 뒤 설치본으로 옮겨 주세요.</p>' +
-                    installBtnHTML('lg-btn') + '</div>';
-            }
-            if (L.soon) {
-                return '<div class="lg-warn lg-soon">' +
-                    '<b>⚠️ ' + L.label + '까지 사용할 수 있습니다 (D-' + L.days + ')</b>' +
-                    '<p>기간이 끝나면 새 입력이 막힙니다. <b>지금 설치본으로 옮겨</b> 주세요.</p>' +
-                    installBtnHTML('lg-btn') + '</div>';
-            }
-            return '<div class="lg-warn lg-ok">' +
-                '<b>📅 ' + L.label + '까지 사용할 수 있습니다 (D-' + L.days + ')</b>' +
-                '<p>이 사이트는 체험용으로 바뀌었습니다. 기간 안에 <b>설치본</b>을 받아 학교 계정으로 옮겨 주세요.</p>' +
-                installBtnHTML('lg-btn') + '</div>';
-        }
-
-        // 학년도 종료 후 삭제된다는 안내
+        // 관리자 화면 위쪽 체험 안내
         function showRetentionNotice(createdAt) {
             const box = document.getElementById('retention-notice');
-
-            // 기존 그룹이면 사용 기한 안내를 우선 보여 준다
-            const L = legacyInfo(currentGroupId);
-            if (L) {
-                box.innerHTML = legacyBannerHTML(L);
-                box.className = 'mb-4';
-                box.classList.remove('hidden');
-                return;
-            }
-
-            box.className = 'hidden bg-amber-50 border border-amber-200 text-amber-900 rounded-lg p-3 text-sm mb-4';
-            if (!createdAt) { box.classList.add('hidden'); return; }
-
-            const year = academicYearOf(createdAt);
-            const expiry = expiryDateOf(createdAt);
-            const expired = new Date() >= expiry;
-
-            box.innerHTML = expired
-                ? `<b>\u26a0\ufe0f ${year}학년도 그룹입니다.</b> 학년도가 종료되어 <b>언제든 삭제될 수 있습니다.</b>
-                   아직 내려받지 않으셨다면 지금 바로 <b>엑셀 다운로드</b>로 자료를 보관해 주세요.`
-                : `<b>\ud83d\udcc5 ${year}학년도 그룹입니다.</b> 이 그룹의 자료는 <b>${expiry.getFullYear()}년 3월</b> 이후 지난 학년도로 분류되어 삭제될 수 있습니다.
-                   학년도가 끝나기 전에 <b>엑셀 다운로드</b>로 자료를 보관해 주세요.`;
+            box.className = 'mb-4';
+            box.innerHTML = demoNoticeHTML();
             box.classList.remove('hidden');
         }
 
@@ -1650,7 +1537,6 @@
         }
 
         async function addMember() {
-            if (blockedByExpiry()) return;
             const role = document.getElementById('new-member-role').value.trim();
             if(!role) return alert('구분을 입력하세요.');
             if(role.length > 30) return alert('구분은 30자 이내로 입력해주세요.');
@@ -1783,11 +1669,9 @@
         }
 
         function loadMembers() {
-            // 기존 그룹이면 사용 기한을 먼저 알린다
-            const nb = document.getElementById('user-legacy-notice');
-            const L = legacyInfo(currentGroupId);
-            if (L) { nb.innerHTML = legacyBannerHTML(L); nb.classList.remove('hidden'); }
-            else { nb.innerHTML = ''; nb.classList.add('hidden'); }
+            // 교원 화면에도 체험 안내를 띄운다
+            const nb = document.getElementById('user-demo-notice');
+            if (nb) { nb.innerHTML = demoNoticeHTML(); nb.classList.remove('hidden'); }
 
             const listDiv = document.getElementById('member-list');
             listDiv.innerHTML = '<div class="col-span-full text-center py-10 text-gray-400">로딩 중...</div>';
@@ -1840,7 +1724,6 @@
         }
 
         async function toggleReturn() {
-            if (blockedByExpiry()) return;
             try {
                 const memberRef = db.collection('groups').doc(currentGroupId).collection('members').doc(currentMemberId);
                 const doc = await memberRef.get();
@@ -1851,7 +1734,6 @@
         }
 
         async function addExpense() {
-            if (blockedByExpiry()) return;
             const category = document.getElementById('expense-category').value;
             const item = document.getElementById('expense-item').value.trim();
             const amount = parseInt(document.getElementById('expense-amount').value);
@@ -2157,7 +2039,7 @@
             document.getElementById('demo-apw').textContent = DEMO.adminPw;
             // 설치 파일·안내서 주소를 한곳(맨 위 두 줄)에서 받아 채운다
             [['dl-guide-open', INSTALL_GUIDE], ['dl-guide-save', INSTALL_GUIDE],
-             ['dl-file-save', INSTALL_FILE], ['install-link-2', INSTALL_GUIDE]
+             ['dl-file-save', INSTALL_FILE]
             ].forEach(function (p) {
                 const a = document.getElementById(p[0]);
                 if (a) a.href = p[1];
