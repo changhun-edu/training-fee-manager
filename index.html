@@ -180,6 +180,44 @@
                   border-radius: 10px; font-weight: 800; font-size: 14px; text-decoration: none; }
         .db-btn:hover { background: #1e3a8a; }
 
+        /* 우리 학교에 설치하기 */
+        .ld-install { background: #fff; border: 2px solid #e2e8f0; border-radius: 16px;
+                      padding: 20px 18px; text-align: left; scroll-margin-top: 16px; }
+        .ld-label { font-size: 11px; font-weight: 800; color: #94a3b8; letter-spacing: 1px;
+                    text-transform: uppercase; margin-bottom: 6px; }
+        .ld-title { font-size: 19px; font-weight: 800; color: #1e293b; line-height: 1.45;
+                    margin-bottom: 14px; word-break: keep-all; }
+        .ld-why { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px;
+                  padding: 13px 15px; margin-bottom: 16px; }
+        .ld-why-t { font-size: 13px; font-weight: 800; color: #1e3a8a; margin-bottom: 5px; }
+        .ld-why-b { font-size: 12.5px; line-height: 1.75; color: #1e40af; word-break: keep-all; }
+        .ld-why-b b { color: #1e3a8a; font-weight: 800; }
+        .ld-steps { margin-bottom: 14px; }
+        .ld-step { display: flex; align-items: flex-start; gap: 9px; font-size: 13.5px;
+                   line-height: 1.7; color: #334155; margin-bottom: 8px; word-break: keep-all; }
+        .ld-step b { color: #1e293b; font-weight: 800; }
+        .ld-num { flex-shrink: 0; width: 21px; height: 21px; border-radius: 50%;
+                  background: #334155; color: #fff; font-size: 11px; font-weight: 800;
+                  display: flex; align-items: center; justify-content: center; margin-top: 3px; }
+        .ld-time { font-size: 11px; font-weight: 700; color: #94a3b8; background: #f1f5f9;
+                   border-radius: 99px; padding: 1px 7px; white-space: nowrap; }
+        .ld-note { background: #ecfdf5; border: 1px solid #6ee7b7; border-radius: 10px;
+                   padding: 11px 13px; font-size: 12.5px; line-height: 1.7; color: #065f46;
+                   margin-bottom: 16px; word-break: keep-all; }
+        .ld-note b { color: #064e3b; font-weight: 800; }
+        .ld-actions { display: flex; flex-direction: column; gap: 8px; }
+        .ld-btn { display: flex; align-items: center; justify-content: center; gap: 6px;
+                  font-size: 13.5px; font-weight: 800; text-align: center; text-decoration: none;
+                  padding: 12px 14px; border-radius: 11px; border: 1.5px solid #e2e8f0;
+                  background: #f8fafc; color: #475569; transition: all .15s; word-break: keep-all; }
+        .ld-btn:hover { background: #eef2f7; border-color: #cbd5e1; color: #1e293b; }
+        .ld-btn.primary { background: #1d4ed8; border-color: #1d4ed8; color: #fff;
+                          box-shadow: 0 2px 8px rgba(29,78,216,.25); }
+        .ld-btn.primary:hover { background: #1e3a8a; border-color: #1e3a8a; color: #fff; }
+        .ld-foot { margin-top: 14px; padding-top: 12px; border-top: 1px solid #f1f5f9;
+                   font-size: 12px; line-height: 1.75; color: #94a3b8; word-break: keep-all; }
+        .ld-foot b { color: #475569; font-weight: 700; }
+
         /* 관리자 메뉴 - 생성 잠금 안내 */
         .demo-lock { background: #fffbeb; border: 2px solid #fcd34d; border-radius: 14px;
                      padding: 16px; text-align: left; }
@@ -286,7 +324,7 @@
                 </div>
                 <p class="db-go">써 보시고 괜찮으면, <b>우리 학교 계정에 설치</b>해 운영하세요.
                    자료가 학교 밖으로 나가지 않습니다.</p>
-                <a id="install-link" href="#" target="_blank" rel="noopener" class="db-btn">📦 우리 학교에 설치하기</a>
+                <a href="#install-section" class="db-btn" onclick="event.preventDefault();goInstallSection();">📦 우리 학교에 설치하기</a>
             </div>
 
             <!-- 직접 입력해 들어가는 길 (체험이 주가 되도록 무게를 낮춘다) -->
@@ -324,6 +362,67 @@
                 <div class="trust-chip">🏫 학교 계정에 설치</div>
                 <div class="trust-chip">🙅 이름·이메일 안 받음</div>
                 <div class="trust-chip">✅ 무료</div>
+            </div>
+
+            <!-- ═══════════════════════════════════════════════════════ -->
+            <!-- 우리 학교에 설치하기                                      -->
+            <!--                                                         -->
+            <!--  ▼▼▼ 배포 파일을 올린 위치 ▼▼▼                          -->
+            <!--  이 사이트와 같은 저장소(깃허브)의 download/ 폴더에        -->
+            <!--    download/setup.html          (설치 파일)              -->
+            <!--    download/install-guide.html  (설치 안내서)            -->
+            <!--  두 파일을 올려 두세요. 경로가 다르면 스크립트 맨 위의     -->
+            <!--  INSTALL_FILE · INSTALL_GUIDE 두 줄만 고치면 됩니다.      -->
+            <!--  ▲▲▲                                                    -->
+            <!-- ═══════════════════════════════════════════════════════ -->
+            <div class="ld-install" id="install-section">
+                <div class="ld-label">우리 학교에 설치하기</div>
+                <div class="ld-title">써 보시고 괜찮으면,<br>학교 것으로 가져가세요</div>
+
+                <div class="ld-why">
+                    <div class="ld-why-t">🔒 왜 학교가 직접 설치하나요?</div>
+                    <div class="ld-why-b">
+                        정산 자료에는 우리 학교 교원의 담당과 지출 내역이 담깁니다.
+                        이 자료가 만든이의 저장소에 쌓이면 만든이가 <b>개인정보 수탁자</b>가 됩니다.
+                        학교가 자기 계정에 설치하면 자료가 <b>학교 밖으로 나가지 않습니다.</b>
+                    </div>
+                </div>
+
+                <div class="ld-steps">
+                    <div class="ld-step">
+                        <span class="ld-num">1</span>
+                        <span><b>Firebase 무료 저장소</b>를 만듭니다 <span class="ld-time">10분</span></span>
+                    </div>
+                    <div class="ld-step">
+                        <span class="ld-num">2</span>
+                        <span>받은 <b>setup.html</b>을 열어 설정을 붙여 넣고 <b>완성된 파일</b>을 받습니다 <span class="ld-time">5분</span></span>
+                    </div>
+                    <div class="ld-step">
+                        <span class="ld-num">3</span>
+                        <span><b>보안 규칙</b>을 넣고 깃허브에 올립니다 <span class="ld-time">10분</span></span>
+                    </div>
+                </div>
+
+                <div class="ld-note">
+                    💰 <b>모두 무료입니다.</b> 서버를 사거나 프로그램을 설치하지 않아도 되고,
+                    학교 규모에서는 Firebase 요금이 나올 일이 없습니다.
+                </div>
+
+                <div class="ld-actions">
+                    <a id="dl-guide-open" class="ld-btn primary" href="download/install-guide.html"
+                       target="_blank" rel="noopener">📖 설치 안내 먼저 보기</a>
+                    <a id="dl-file-save" class="ld-btn" href="download/setup.html" download="setup.html">
+                        📥 설치 파일 내려받기 (setup.html)
+                    </a>
+                    <a id="dl-guide-save" class="ld-btn" href="download/install-guide.html" download="install-guide.html">
+                        📥 설치 안내서 내려받기
+                    </a>
+                </div>
+
+                <div class="ld-foot">
+                    두 파일을 <b>같은 폴더</b>에 두고 설치 안내서를 순서대로 따라가시면 됩니다.<br>
+                    설치가 끝나면 이 체험 사이트와 상관없이 <b>학교 주소로 따로 운영</b>됩니다.
+                </div>
             </div>
 
             <!-- 개인정보 처리 안내 -->
@@ -415,7 +514,7 @@
                 <p>이곳은 <b>체험용 사이트</b>입니다. 아래 체험 계정으로 관리자 화면을 둘러보실 수 있습니다.</p>
                 <p class="dl-go">우리 학교에서 실제로 쓰시려면 <b>설치본</b>을 받아 학교 계정에 설치하세요.
                    자료가 학교 안에만 저장됩니다.</p>
-                <a id="install-link-2" href="#" target="_blank" rel="noopener" class="dl-btn">📦 설치본 받기</a>
+                <a id="install-link-2" href="download/install-guide.html" target="_blank" rel="noopener" class="dl-btn">📦 설치본 받기</a>
             </div>
             <button onclick="showScreen('screen-admin-login')" class="bg-gray-800 text-white w-full py-4 rounded-lg font-bold hover:bg-gray-700">🔒 체험용 그룹 관리 (로그인)</button>
             <button onclick="showScreen('screen-home')" class="w-full text-gray-500 py-2 mt-4 hover:underline">뒤로가기</button>
@@ -672,18 +771,16 @@
             teacherPw: 'demo1234!',             // 교원 비밀번호
             adminPw:   'demoadmin!'             // 관리자 비밀번호
         };
-        const INSTALL_URL = 'https://drive.google.com/drive/folders/1mNRKGgGYKsgzmfXvXDaUc8ICxxjrzyiF?usp=sharing';   // 설치본 받는 곳
-
-        /** 설치본 주소를 실제로 적어 두셨는지 확인한다 */
-        function installUrlReady() {
-            return /^https?:\/\//.test(INSTALL_URL) && INSTALL_URL.indexOf('여기에') < 0;
-        }
-        function installNotReady() {
-            alert('설치본을 받는 주소가 아직 연결되지 않았습니다.\n\n' +
-                'index.html 맨 위의 INSTALL_URL 에\n' +
-                '설치본(setup.html·설치안내서)을 올려 두신 주소를 적어 주세요.\n\n' +
-                '구글 드라이브 공유 폴더 주소면 충분합니다.');
-        }
+        /* ── 설치본 받는 곳 ───────────────────────────────────────────
+           이 사이트와 같은 저장소(깃허브)의 download/ 폴더에
+             download/setup.html         (설치 파일 = 프로그램 + 설치 마법사)
+             download/install-guide.html (설치 안내서)
+           두 파일을 올려 두면 됩니다.
+           경로를 바꾸셨다면 아래 두 줄만 고치시면 화면 전체에 반영됩니다.
+           ───────────────────────────────────────────────────────── */
+        const INSTALL_FILE  = 'download/setup.html';          // 설치 파일
+        const INSTALL_GUIDE = 'download/install-guide.html';  // 설치 안내서
+        const INSTALL_URL   = INSTALL_GUIDE;                  // '설치본 받기'를 누르면 안내서부터 보여 준다
 
         /* 체험장 전환 전부터 쓰고 계시던 그룹 — 정해진 날까지만 열어 둡니다.
            만료 뒤에는 입력만 막고, 자료를 꺼낼 수 있도록 엑셀 내려받기는 남겨 둡니다.
@@ -1340,12 +1437,18 @@
         }
 
         /** 기존 그룹 사용 기한 안내를 그린다 (교원·관리자 화면 공용) */
-        /** 설치본 버튼 — 주소가 없으면 눌렀을 때 안내가 뜨게 한다 */
+        /** 첫 화면의 '우리 학교에 설치하기' 자리로 부드럽게 내려간다 */
+        function goInstallSection() {
+            showScreen('screen-home');
+            setTimeout(function () {
+                const box = document.getElementById('install-section');
+                if (box) box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 60);
+        }
+
+        /** 설치본 버튼 — 설치 안내서를 새 탭으로 연다 */
         function installBtnHTML(cls) {
-            if (installUrlReady()) {
-                return '<a href="' + INSTALL_URL + '" target="_blank" rel="noopener" class="' + cls + '">📦 설치본 받기</a>';
-            }
-            return '<a href="#" class="' + cls + '" onclick="event.preventDefault();installNotReady();">📦 설치본 받기</a>';
+            return '<a href="' + INSTALL_GUIDE + '" target="_blank" rel="noopener" class="' + cls + '">📦 설치본 받기</a>';
         }
 
         function legacyBannerHTML(L) {
@@ -2052,14 +2155,12 @@
             document.getElementById('demo-group').textContent = DEMO.group;
             document.getElementById('demo-tpw').textContent = DEMO.teacherPw;
             document.getElementById('demo-apw').textContent = DEMO.adminPw;
-            // 설치본 주소가 아직 설정되지 않았으면, 빈 페이지로 보내지 말고 안내한다
-            ['install-link', 'install-link-2'].forEach(function (id) {
-                const a = document.getElementById(id);
-                if (!a) return;
-                if (installUrlReady()) { a.href = INSTALL_URL; return; }
-                a.href = '#';
-                a.removeAttribute('target');
-                a.onclick = function (e) { e.preventDefault(); installNotReady(); };
+            // 설치 파일·안내서 주소를 한곳(맨 위 두 줄)에서 받아 채운다
+            [['dl-guide-open', INSTALL_GUIDE], ['dl-guide-save', INSTALL_GUIDE],
+             ['dl-file-save', INSTALL_FILE], ['install-link-2', INSTALL_GUIDE]
+            ].forEach(function (p) {
+                const a = document.getElementById(p[0]);
+                if (a) a.href = p[1];
             });
             // ※ 그룹명을 미리 채워 두지 않는다.
             //   자기 그룹명을 넣으려는 분에게 방해가 되기 때문이다.
