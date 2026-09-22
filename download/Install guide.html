@@ -1,1 +1,329 @@
 
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>설치 안내서 · 교원 자율연수비 정산 시스템</title>
+<!-- Pretendard (SIL Open Font License 1.1) - https://github.com/orioncactus/pretendard -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  :root{
+    --blue:#1d4ed8; --blue-d:#1e3a8a; --blue-50:#eff6ff; --blue-100:#bfdbfe;
+    --ink:#1e293b; --body:#334155; --mute:#64748b; --faint:#94a3b8;
+    --line:#e2e8f0; --bg:#f0f4f8; --amber-bg:#fffbeb; --amber-line:#fcd34d; --amber-ink:#78350f;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--body);
+    font-family:'Pretendard',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif;
+    line-height:1.7; word-break:keep-all; -webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:760px; margin:0 auto; padding:20px 16px 60px}
+
+  /* 머리말 */
+  .hero{background:#fff; border:2px solid var(--line); border-radius:18px; padding:26px 22px; text-align:center}
+  .hero .ic{font-size:40px; line-height:1}
+  .hero h1{font-size:23px; font-weight:800; color:var(--ink); margin:10px 0 6px; line-height:1.45}
+  .hero .sub{font-size:13.5px; color:var(--mute); margin:0}
+  .hero .kv{display:flex; justify-content:center; gap:8px; flex-wrap:wrap; margin-top:16px}
+  .kv span{font-size:12px; font-weight:700; color:#475569; background:#f8fafc;
+           border:1.5px solid var(--line); padding:6px 12px; border-radius:99px}
+
+  /* 공통 카드 */
+  .card{background:#fff; border:2px solid var(--line); border-radius:16px; padding:20px 18px; margin-top:16px}
+  .card h2{font-size:17px; font-weight:800; color:var(--ink); margin:0 0 4px; display:flex; align-items:center; gap:9px}
+  .card h2 .n{flex-shrink:0; width:27px; height:27px; border-radius:50%; background:var(--blue); color:#fff;
+              font-size:14px; font-weight:800; display:flex; align-items:center; justify-content:center}
+  .card .time{font-size:11px; font-weight:700; color:var(--faint); background:#f1f5f9;
+              border-radius:99px; padding:2px 8px; margin-left:auto; white-space:nowrap}
+  .card p{font-size:14px; margin:9px 0 0}
+  .card ul,.card ol{font-size:14px; margin:9px 0 0; padding-left:20px}
+  .card li{margin-bottom:6px}
+  .card b{color:var(--ink); font-weight:800}
+  .lead{font-size:14px; color:var(--body); margin:0}
+
+  code{background:#f1f5f9; border:1px solid var(--line); border-radius:6px; padding:1px 6px;
+       font-family:ui-monospace,Menlo,Consolas,monospace; font-size:.92em; color:#0f172a; word-break:break-all}
+  a{color:var(--blue); text-underline-offset:2px}
+
+  .tip{background:var(--blue-50); border:1px solid var(--blue-100); border-radius:11px;
+       padding:12px 14px; margin-top:12px; font-size:13px; color:#1e40af}
+  .tip b{color:#1e3a8a}
+  .warn{background:var(--amber-bg); border:1px solid var(--amber-line); border-radius:11px;
+        padding:12px 14px; margin-top:12px; font-size:13px; color:var(--amber-ink)}
+  .warn b{color:#92400e}
+  .ok{background:#ecfdf5; border:1px solid #6ee7b7; border-radius:11px;
+      padding:12px 14px; margin-top:12px; font-size:13px; color:#065f46}
+  .ok b{color:#064e3b}
+
+  /* 내려받기 버튼 */
+  .dl{display:flex; flex-direction:column; gap:8px; margin-top:14px}
+  .dl a{display:flex; align-items:center; justify-content:center; gap:6px; text-decoration:none;
+        font-size:14px; font-weight:800; padding:13px 14px; border-radius:11px;
+        border:1.5px solid var(--line); background:#f8fafc; color:#475569}
+  .dl a:hover{background:#eef2f7; border-color:#cbd5e1; color:var(--ink)}
+  .dl a.primary{background:var(--blue); border-color:var(--blue); color:#fff; box-shadow:0 2px 8px rgba(29,78,216,.25)}
+  .dl a.primary:hover{background:var(--blue-d); border-color:var(--blue-d)}
+
+  /* 한눈에 보기 */
+  .map{display:flex; flex-direction:column; gap:0}
+  .map div{display:flex; align-items:flex-start; gap:10px; font-size:13.5px; padding:7px 0;
+           border-bottom:1px dashed #edf2f7}
+  .map div:last-child{border-bottom:0}
+  .map .mn{flex-shrink:0; width:22px; height:22px; border-radius:50%; background:#334155; color:#fff;
+           font-size:11px; font-weight:800; display:flex; align-items:center; justify-content:center; margin-top:2px}
+
+  /* 자주 묻는 것 */
+  details{border:1.5px solid var(--line); border-radius:11px; margin-top:8px; background:#fff}
+  details[open]{border-color:var(--blue-100)}
+  summary{cursor:pointer; list-style:none; padding:12px 14px; font-size:13.5px; font-weight:800; color:var(--ink)}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:'▾'; float:right; color:var(--faint)}
+  details[open] summary::after{content:'▴'}
+  details .db{padding:0 14px 14px; font-size:13px; color:var(--body); border-top:1px solid #f1f5f9; padding-top:11px}
+
+  .foot{text-align:center; margin-top:26px; font-size:12px; color:var(--faint); line-height:1.8}
+  .foot b{color:var(--mute)}
+  .print{display:block; margin:18px auto 0; background:#fff; border:1.5px solid var(--line);
+         border-radius:10px; padding:10px 18px; font-size:13px; font-weight:700; color:#475569;
+         font-family:inherit; cursor:pointer}
+  .print:hover{background:#f8fafc; color:var(--ink)}
+
+  @media print{
+    body{background:#fff}
+    .card,.hero{border-color:#cbd5e1; break-inside:avoid}
+    .print,.dl{display:none}
+    details{border:0} details .db{display:block !important}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <div class="ic">🔧</div>
+    <h1>교원 자율연수비 정산 시스템<br>우리 학교에 설치하기</h1>
+    <p class="sub">안내서를 순서대로 따라가시면 <b>25분</b>이면 끝납니다</p>
+    <div class="kv">
+      <span>🆓 모두 무료</span>
+      <span>🏫 자료는 학교 계정에만</span>
+      <span>🙅 이름·이메일 안 받음</span>
+    </div>
+  </div>
+
+  <!-- 준비물 -->
+  <div class="card">
+    <h2>준비하실 것</h2>
+    <ul>
+      <li><b>구글 계정</b> — 저장소(Firebase)를 만들고, 총괄 관리자로 로그인할 때 씁니다.</li>
+      <li><b>깃허브(GitHub) 계정</b> — 완성한 파일을 인터넷에 올릴 때 씁니다. 없으시면 <a href="https://github.com/signup" target="_blank" rel="noopener">github.com/signup</a>에서 무료로 만드실 수 있습니다.</li>
+      <li><b>파일 두 개</b> — <code>setup.html</code>(설치 파일)과 이 안내서. 아직 안 받으셨다면 아래에서 받으세요.</li>
+    </ul>
+    <div class="dl">
+      <a class="primary" href="setup.html" download="setup.html">📥 설치 파일 내려받기 (setup.html)</a>
+    </div>
+    <div class="tip">
+      💡 <b>설치는 한 번만 하면 됩니다.</b> 한 번 올려 두면 해마다 그대로 쓰시면 되고,
+      학교 규모에서는 Firebase 요금이 나올 일이 없습니다.
+    </div>
+  </div>
+
+  <!-- 한눈에 -->
+  <div class="card">
+    <h2>설치 순서 한눈에</h2>
+    <div class="map">
+      <div><span class="mn">1</span><span>Firebase 저장소 만들기</span></div>
+      <div><span class="mn">2</span><span>웹 앱 추가하고 설정값 복사하기</span></div>
+      <div><span class="mn">3</span><span><code>setup.html</code> 열어 설정 붙여 넣기</span></div>
+      <div><span class="mn">4</span><span>로그인·저장소 기능 켜기</span></div>
+      <div><span class="mn">5</span><span>보안 규칙 붙여넣고 게시하기</span></div>
+      <div><span class="mn">6</span><span>완성된 <code>index.html</code> 내려받기</span></div>
+      <div><span class="mn">7</span><span>깃허브에 올려 주소 만들기</span></div>
+      <div><span class="mn">8</span><span>그 주소를 승인된 도메인에 넣기</span></div>
+      <div><span class="mn">9</span><span>첫 그룹 만들고 교원에게 알리기</span></div>
+    </div>
+  </div>
+
+  <!-- 1 -->
+  <div class="card">
+    <h2><span class="n">1</span> Firebase 저장소 만들기 <span class="time">5분</span></h2>
+    <p>우리 학교 자료가 쌓일 곳입니다. 만든이를 포함해 누구에게도 전송되지 않습니다.</p>
+    <ol>
+      <li><a href="https://console.firebase.google.com/" target="_blank" rel="noopener">console.firebase.google.com</a>에 학교 구글 계정으로 들어갑니다.</li>
+      <li><b>[프로젝트 만들기]</b>를 누릅니다.</li>
+      <li>이름은 <code>연수비정산</code>처럼 알아보기 쉽게 정합니다.</li>
+      <li>구글 애널리틱스는 <b>사용 안 함</b>으로 두셔도 됩니다.</li>
+    </ol>
+    <div class="tip">💡 학교 공용 계정으로 만드시면 담당자가 바뀌어도 그대로 넘길 수 있습니다.</div>
+  </div>
+
+  <!-- 2 -->
+  <div class="card">
+    <h2><span class="n">2</span> 웹 앱 추가하고 설정값 복사하기 <span class="time">3분</span></h2>
+    <ol>
+      <li>프로젝트 첫 화면에서 <b>&lt;/&gt;</b> 모양 아이콘을 누릅니다.</li>
+      <li>앱 이름을 아무렇게나 적고 <b>[앱 등록]</b>을 누릅니다.</li>
+      <li><code>const firebaseConfig = { … }</code> 가 나옵니다. <b>중괄호 부분을 통째로 복사</b>합니다.</li>
+    </ol>
+    <div class="warn">⚠️ 이 값은 비밀번호가 아닙니다. 공개되어도 <b>보안 규칙</b>(5단계)이 자료를 지켜 줍니다. 규칙 게시를 꼭 해 주세요.</div>
+  </div>
+
+  <!-- 3 -->
+  <div class="card">
+    <h2><span class="n">3</span> setup.html 열어 설정 붙여 넣기 <span class="time">3분</span></h2>
+    <ol>
+      <li>내려받은 <code>setup.html</code>을 <b>더블클릭</b>해 브라우저로 엽니다. (인터넷은 연결되어 있어야 합니다)</li>
+      <li><b>설치 마법사</b> 화면이 나옵니다. 3번 칸에 방금 복사한 설정을 붙여 넣습니다.</li>
+      <li>4번 칸에 <b>총괄 관리자로 쓸 구글 계정</b>을 적습니다. 학교 전체 그룹을 보고 지울 수 있는 계정입니다. 여러 명이면 쉼표로 구분합니다.</li>
+      <li><b>[🔍 설정 확인하기]</b>를 누릅니다. 연결되면 5~7단계가 이어서 나타납니다.</li>
+    </ol>
+    <div class="tip">💡 <b>파일을 편집기로 열어 고칠 필요가 없습니다.</b> 마법사가 값을 넣은 파일을 만들어 줍니다.</div>
+  </div>
+
+  <!-- 4 -->
+  <div class="card">
+    <h2><span class="n">4</span> 로그인·저장소 기능 켜기 <span class="time">5분</span></h2>
+    <p>Firebase 콘솔에서 세 가지를 켭니다. 마법사 화면의 <b>[Authentication 열기]</b>, <b>[Firestore 열기]</b> 단추를 쓰면 바로 갑니다.</p>
+    <ul>
+      <li><b>Authentication</b> → 시작하기 → <b>이메일/비밀번호</b> 사용 설정</li>
+      <li>같은 화면에서 <b>Google</b> 사용 설정 (총괄 관리자 로그인용)</li>
+      <li><b>Firestore Database</b> → 데이터베이스 만들기 → 위치는 <code>asia-northeast3</code>(서울)</li>
+    </ul>
+  </div>
+
+  <!-- 5 -->
+  <div class="card">
+    <h2><span class="n">5</span> 보안 규칙 붙여넣고 게시하기 <span class="time">3분</span></h2>
+    <ol>
+      <li>마법사의 <b>[📋 보안 규칙 복사]</b>를 누릅니다. (총괄 관리자 계정이 들어간 규칙이 만들어집니다)</li>
+      <li><b>[규칙 탭 열기]</b>로 이동해 <b>Firestore → 규칙</b> 칸의 내용을 지우고 통째로 붙여 넣습니다.</li>
+      <li><b>[게시]</b>를 누릅니다.</li>
+    </ol>
+    <div class="warn">⚠️ <b>이 단계를 건너뛰면 자료가 누구에게나 열립니다.</b> 반드시 게시까지 마쳐 주세요.</div>
+  </div>
+
+  <!-- 6 -->
+  <div class="card">
+    <h2><span class="n">6</span> 완성된 index.html 내려받기 <span class="time">1분</span></h2>
+    <p>마법사 7단계의 <b>[⬇ 설정이 끝난 index.html 내려받기]</b>를 누릅니다.
+       우리 학교 설정이 모두 들어간 <code>index.html</code> 한 개가 저장됩니다. 이 파일이 <b>우리 학교 프로그램</b>입니다.</p>
+    <div class="tip">💡 <code>setup.html</code>은 설치용이라 올리지 않으셔도 됩니다. 나중에 다시 설치할 일이 있을 수 있으니 컴퓨터에 보관해 두세요.</div>
+  </div>
+
+  <!-- 7 -->
+  <div class="card">
+    <h2><span class="n">7</span> 깃허브에 올려 주소 만들기 <span class="time">5분</span></h2>
+    <ol>
+      <li><a href="https://github.com/new" target="_blank" rel="noopener">github.com/new</a>에서 새 저장소를 만듭니다.
+          이름은 <code>yeonsubi</code>처럼 영문으로 정하고, <b>Public</b>으로 둡니다.</li>
+      <li>만들어진 저장소에서 <b>[Add file] → [Upload files]</b>를 누르고, 6단계에서 받은 <b><code>index.html</code>을 끌어다 놓습니다.</b></li>
+      <li>아래 <b>[Commit changes]</b>를 눌러 저장합니다.</li>
+      <li><b>[Settings] → 왼쪽 [Pages]</b>로 갑니다.</li>
+      <li>Source를 <b>Deploy from a branch</b>, 가지는 <b>main</b>, 폴더는 <b>/(root)</b>로 두고 <b>[Save]</b>를 누릅니다.</li>
+      <li>1~2분 뒤 같은 화면 위쪽에 <code>https://<b>계정이름</b>.github.io/<b>저장소이름</b>/</code> 주소가 나타납니다. <b>이 주소가 우리 학교 정산 사이트</b>입니다.</li>
+    </ol>
+    <div class="warn">
+      ⚠️ 저장소가 Public이어도 <b>자료가 공개되는 것이 아닙니다.</b> 공개되는 것은 프로그램 파일뿐이고,
+      정산 내용은 우리 학교 Firebase에 들어 있으며 보안 규칙과 비밀번호로 막혀 있습니다.
+    </div>
+    <div class="tip">💡 학교 홈페이지나 다른 호스팅에 올리셔도 됩니다. <b>파일 하나만 올리면 되는 구조</b>라 올릴 수 있는 곳이면 어디든 동작합니다.</div>
+  </div>
+
+  <!-- 8 -->
+  <div class="card">
+    <h2><span class="n">8</span> 주소를 승인된 도메인에 넣기 <span class="time">2분</span></h2>
+    <p>총괄 관리자의 <b>구글 로그인</b>이 되도록 주소를 등록합니다.</p>
+    <ol>
+      <li>Firebase 콘솔 → <b>Authentication → 설정 → 승인된 도메인</b></li>
+      <li><b>[도메인 추가]</b>를 누르고 <code>계정이름.github.io</code> 를 적습니다. (<code>https://</code>와 뒷부분 없이 주소만)</li>
+    </ol>
+    <div class="ok">✅ 여기까지 하시면 설치가 끝났습니다. 7단계의 주소로 들어가 보세요.</div>
+  </div>
+
+  <!-- 9 -->
+  <div class="card">
+    <h2><span class="n">9</span> 첫 그룹 만들고 교원에게 알리기 <span class="time">3분</span></h2>
+    <ol>
+      <li>우리 학교 주소로 들어가 <b>[담당자 로그인] → [새 그룹 만들기]</b>를 누릅니다.</li>
+      <li>그룹명은 <code>2026 행복초 78</code>처럼 <b>숫자를 섞어</b> 정합니다. 너무 쉬운 이름은 다른 사람이 접속할 수 있습니다.</li>
+      <li><b>관리자 비밀번호</b>와 <b>교원 비밀번호</b>를 정합니다. 잃어버리면 찾을 수 없으니 따로 적어 두세요.</li>
+      <li>교원 명단(담당)을 추가합니다. <b>이름·이메일은 넣지 않습니다.</b></li>
+      <li>교원에게는 <b>주소 · 그룹명 · 교원 비밀번호</b> 세 가지만 알리면 됩니다. 그룹 생성 화면의 <b>[안내문 복사]</b>를 쓰시면 편합니다.</li>
+    </ol>
+    <div class="tip">💡 총괄 관리자 화면은 오른쪽 아래 <b>만든이 표기를 다섯 번 연속</b> 누르면 열립니다. 3단계에서 적은 구글 계정으로 로그인합니다.</div>
+  </div>
+
+  <!-- 문제 해결 -->
+  <div class="card">
+    <h2>막히실 때</h2>
+
+    <details>
+      <summary>화면이 하얗게 나옵니다</summary>
+      <div class="db">인터넷 연결을 확인해 주세요. 프로그램이 글꼴·엑셀 기능을 인터넷에서 불러옵니다.
+      학교 방화벽이 <code>gstatic.com</code>, <code>jsdelivr.net</code>, <code>cdnjs.cloudflare.com</code>을 막고 있으면 열리지 않을 수 있습니다.</div>
+    </details>
+
+    <details>
+      <summary>설치 마법사에서 "연결하지 못했습니다"가 뜹니다</summary>
+      <div class="db">설정값을 중괄호 <code>{ }</code>까지 통째로 붙여 넣으셨는지 확인해 주세요.
+      "Firestore 데이터베이스가 아직 없습니다"가 뜨면 4단계의 <b>Firestore Database → 데이터베이스 만들기</b>를 먼저 해 주세요.</div>
+    </details>
+
+    <details>
+      <summary>총괄 관리자 구글 로그인이 안 됩니다</summary>
+      <div class="db">8단계 <b>승인된 도메인</b>에 사이트 주소를 넣으셨는지, 4단계에서 <b>Google</b> 로그인을 켜셨는지 확인해 주세요.
+      그래도 안 되면 3단계에서 적은 구글 계정과 지금 로그인한 계정이 같은지 보십시오.</div>
+    </details>
+
+    <details>
+      <summary>"권한이 없습니다 / permission denied"가 뜹니다</summary>
+      <div class="db">5단계 보안 규칙을 <b>게시</b>하지 않으셨을 때 나옵니다. 규칙 탭에 붙여 넣고 [게시]까지 눌러 주세요.</div>
+    </details>
+
+    <details>
+      <summary>관리자 비밀번호를 잃어버렸습니다</summary>
+      <div class="db">비밀번호는 저장만 될 뿐 찾아 드릴 방법이 없습니다.
+      총괄 관리자 화면에서 그 그룹을 지우고 새로 만드셔야 합니다. 자료는 지우기 전에 <b>엑셀로 내려받아</b> 보관해 주세요.</div>
+    </details>
+
+    <details>
+      <summary>다음 해에는 어떻게 하나요</summary>
+      <div class="db">사이트는 그대로 두시고 <b>새 학년도 그룹만 새로 만들면</b> 됩니다.
+      학년도는 3월에 시작해 다음 해 2월에 끝나고, 지난 학년도 그룹은 총괄 관리자 화면에서 한 번에 지울 수 있습니다.
+      지우기 전에 엑셀로 내려받아 보관해 주세요.</div>
+    </details>
+
+    <details>
+      <summary>프로그램을 고쳐 써도 되나요</summary>
+      <div class="db">학교 현장에서 쓰시는 범위라면 자유롭게 고쳐 쓰시고 동료에게 나눠 주셔도 됩니다.
+      다만 <b>상업적 이용은 허락하지 않습니다.</b> 고치실 때는 <code>index.html</code> 하나만 손보면 됩니다.</div>
+    </details>
+  </div>
+
+  <!-- 개인정보 -->
+  <div class="card">
+    <h2>설치하고 나면 달라지는 것</h2>
+    <ul>
+      <li>정산 자료가 <b>학교 계정 안에만</b> 머뭅니다. 만든이도 열어볼 수 없습니다.</li>
+      <li>학교가 <b>직접 관리</b>하는 것이 되어, 외부에 맡기는 절차가 필요 없습니다.</li>
+      <li>학년도가 끝나면 <b>학교가 스스로 지울</b> 수 있습니다.</li>
+      <li>만든이의 사정과 관계없이 <b>계속 쓰실</b> 수 있습니다.</li>
+    </ul>
+    <div class="tip">
+      이 프로그램은 <b>이름·이메일 주소·연락처·주민등록번호·계좌번호를 일절 받지 않습니다.</b>
+      저장되는 것은 그룹명, 담당(1학년 1반 등), 본인 확인용 비밀번호, 지출 항목명·금액·입력 일시뿐입니다.
+    </div>
+  </div>
+
+  <button class="print" onclick="window.print()">🖨️ 이 안내서 인쇄하기</button>
+
+  <div class="foot">
+    교원 자율연수비 정산 시스템 · 설치 안내서<br>
+    <b>© 2026 최창훈</b> · 비영리 목적의 사용·복제·수정·배포를 허락합니다 (상업적 이용 제외)<br>
+    사용한 오픈소스 · Pretendard (SIL OFL 1.1) · Tailwind CSS (MIT) · ExcelJS (MIT) · Firebase JS SDK (Apache 2.0)
+  </div>
+
+</div>
+</body>
+</html>
